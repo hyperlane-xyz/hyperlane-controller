@@ -14,7 +14,7 @@ import {
 } from "@abacus-network/sdk";
 import { utils } from "@abacus-network/utils";
 
-import { ControllerRouter, TestSet, TestSet__factory } from "../../types";
+import { ControllerRouter, TestSet, TestSet__factory } from "./types";
 
 import { ControllerConfig, ControllerDeploy } from "./lib/ControllerDeploy";
 import { formatCall, increaseTimestampBy } from "./lib/utils";
