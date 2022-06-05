@@ -1,37 +1,31 @@
 import { expect } from 'chai';
-import { ethers } from 'ethers';
 
 import { AbacusRouterChecker } from '@abacus-network/deploy';
 import {
   ChainMap,
   ChainName,
-  ControllerApp,
   MultiProvider,
-  objMap,
 } from '@abacus-network/sdk';
-import { types } from '@abacus-network/utils';
+import { ControllerConfig, ControllerContracts } from './config';
+import { ControllerApp } from './app';
 
-import { ControllerConfig } from './types';
 
 export class ControllerChecker<
   Chain extends ChainName,
 > extends AbacusRouterChecker<
   Chain,
+  ControllerContracts,
   ControllerApp<Chain>,
-  ControllerConfig & {
-    owner: types.Address;
-  }
+  ControllerConfig
 > {
   constructor(
     multiProvider: MultiProvider<any>,
     app: ControllerApp<Chain>,
-    configMap: ChainMap<Chain, ControllerConfig>,
+    configMap: ChainMap<Chain, ControllerConfig & { abacusConnectionManager: string }>,
   ) {
-    const joinedConfig = objMap(configMap, (_, config) => ({
-      ...config,
-      owner: config.controller ?? ethers.constants.AddressZero,
-    }));
-    super(multiProvider, app, joinedConfig);
+    // Controller does not really check for ownership in the traditional sense, since it is it own owner
+    // @ts-ignore
+    super(multiProvider, app, configMap);
   }
 
   // ControllerRouter's owner is 0x0 on all chains except the controlling chain as setup in the constructor
@@ -39,7 +33,7 @@ export class ControllerChecker<
     const contracts = this.app.getContracts(chain);
 
     // check router's owner with the config
-    const routerOwner = await contracts.router.owner();
+    const routerOwner = await contracts.router.contract.owner();
     expect(routerOwner).to.equal(this.configMap[chain].owner);
 
     // check ubc is owned by local router
@@ -54,18 +48,13 @@ export class ControllerChecker<
   }
 
   async checkProxiedContracts(chain: Chain): Promise<void> {
-    const addresses = this.app.getAddresses(chain);
-    // Outbox upgrade setup contracts are defined
-    await this.checkUpgradeBeacon(chain, 'ControllerRouter', addresses.router);
+    const addresses = this.app.contractsMap[chain].router.addresses
+    await this.checkUpgradeBeacon(chain, 'ControllerRouter', addresses);
   }
 
   async checkRecoveryManager(chain: Chain): Promise<void> {
-    const actual = await this.mustGetRouter(chain).recoveryManager();
+    const actual = await this.app.contractsMap[chain].router.contract.recoveryManager();
     const config = this.configMap[chain];
     expect(actual).to.equal(config.recoveryManager);
-  }
-
-  mustGetRouter(chain: Chain) {
-    return this.app.getContracts(chain).router;
   }
 }

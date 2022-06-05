@@ -3,27 +3,22 @@ import { PopulatedTransaction } from 'ethers';
 
 import { MultisigValidatorManager__factory } from '@abacus-network/core';
 import {
+  AbacusCoreChecker,
   CheckerViolation,
   CoreConfig,
-  ProxyViolationType,
   UpgradeBeaconViolation,
 } from '@abacus-network/deploy';
 import {
   AbacusCore,
-  Call,
   ChainMap,
   ChainName,
-  ControllerApp,
   MultiProvider,
   objMap,
 } from '@abacus-network/sdk';
-
-import {
-  AbacusCoreChecker,
-  CoreViolationType,
-  ValidatorViolation,
-  ValidatorViolationType,
-} from './check';
+import { Call } from './utils';
+import { ControllerApp } from './app';
+import { CoreViolationType, ValidatorViolation, ValidatorViolationType } from '@abacus-network/deploy/dist/src/core/check';
+import { ProxyKind } from '@abacus-network/sdk/dist/proxy';
 
 interface CallWithTarget {
   chain: ChainName;
@@ -65,7 +60,7 @@ export class AbacusCoreControllerChecker<
 
   handleViolation(v: CheckerViolation): Promise<CallWithTarget> {
     switch (v.type) {
-      case ProxyViolationType.UpgradeBeacon:
+      case ProxyKind.UpgradeBeacon:
         return this.handleUpgradeBeaconViolation(v as UpgradeBeaconViolation);
       case CoreViolationType.Validator:
         return this.handleValidatorViolation(v as ValidatorViolation);
@@ -132,7 +127,7 @@ export class AbacusCoreControllerChecker<
   expectCalls(chains: Chain[], count: number[]) {
     expect(chains).to.have.lengthOf(count.length);
     chains.forEach((chain, i) => {
-      expect(this.controllerApp.getCalls(chain)).to.have.lengthOf(count[i]);
+      expect(this.controllerApp.calls[chain]).to.have.lengthOf(count[i]);
     });
   }
 }

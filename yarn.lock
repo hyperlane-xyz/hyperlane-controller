@@ -2,49 +2,49 @@
 # yarn lockfile v1
 
 
-"@abacus-network/app@^0.2.1-alpha9":
-  version "0.2.1-alpha9"
-  resolved "https://registry.yarnpkg.com/@abacus-network/app/-/app-0.2.1-alpha9.tgz#4393dbf1184f30a00627087b5fb8ee2d54ffd5f2"
-  integrity sha512-puukhK50ftg1xi9gimgQVr+dX3mGkknw1LZoOsOoteazuSH41ln498LfG83+E2oKORZRKWBI10i/53h+hHEiYA==
+"@abacus-network/app@^0.2.1-alpha11":
+  version "0.2.1-alpha11"
+  resolved "https://registry.yarnpkg.com/@abacus-network/app/-/app-0.2.1-alpha11.tgz#81129875abbe84a183c55ba9f25e1d377e0fb2f6"
+  integrity sha512-Gxcfo9nBAjgLcNyOr72ZCBhGT2ap8v9aF+JQlBwMs63avKkCrJ+DDlCnBaogVCWjMzMo7XEU2fhkRz+pb2twow==
   dependencies:
-    "@abacus-network/core" "^0.2.1-alpha9"
-    "@abacus-network/utils" "^0.2.1-alpha9"
+    "@abacus-network/core" "^0.2.1-alpha11"
+    "@abacus-network/utils" "^0.2.1-alpha11"
     "@openzeppelin/contracts-upgradeable" "^4.5.0"
 
-"@abacus-network/core@^0.2.1-alpha9":
-  version "0.2.1-alpha9"
-  resolved "https://registry.yarnpkg.com/@abacus-network/core/-/core-0.2.1-alpha9.tgz#09ed0c67376c7407288864c651faca02373d2a00"
-  integrity sha512-N6TIGsHvlF68Gz+rUBIQM4u5CViJLd86uRTAKU6Z0+mt7TTLh3hE2cpgr41D6FOFEZk5cBxw+tsMze97iqtkOw==
+"@abacus-network/core@^0.2.1-alpha11":
+  version "0.2.1-alpha11"
+  resolved "https://registry.yarnpkg.com/@abacus-network/core/-/core-0.2.1-alpha11.tgz#a48d4a9743e1f5f20a3a39820fcbc1a593d08755"
+  integrity sha512-CDDlj6jrjFr3FjZNNyO1hCquZxuIa5FzocV0dXW3um/ayAN0DsnrU1BQMuDh3sZ3YJWXrw7bl045gGBrgjKtcQ==
   dependencies:
-    "@abacus-network/utils" "^0.2.1-alpha9"
+    "@abacus-network/utils" "^0.2.1-alpha11"
     "@openzeppelin/contracts" "^4.6.0"
     "@openzeppelin/contracts-upgradeable" "^4.6.0"
     "@summa-tx/memview-sol" "^2.0.0"
 
-"@abacus-network/deploy@^0.2.1-alpha9":
-  version "0.2.1-alpha9"
-  resolved "https://registry.yarnpkg.com/@abacus-network/deploy/-/deploy-0.2.1-alpha9.tgz#c71774ec68e7ec156acb490b30a17aa42e6d51b9"
-  integrity sha512-JUl0ZwDXSsixtgJd8IVaOcviwUjwfoH4hqXgJuaWJRARQrv5FW+69OdLN66YNUNTsgaMgAzvoIU+ljf7282L8A==
+"@abacus-network/deploy@^0.2.1-alpha11":
+  version "0.2.1-alpha11"
+  resolved "https://registry.yarnpkg.com/@abacus-network/deploy/-/deploy-0.2.1-alpha11.tgz#6d22d7830c6eda2f03a3e2b49b5f4750b6a5bfd6"
+  integrity sha512-UcdGpZDIlsVfqdGv34DlTorH7hrlZs+6L0DPHcI//ZLnDhyZxesAgszN4k4KOjIUBUO2/FvCPD94p6jSluSJkQ==
   dependencies:
-    "@abacus-network/app" "^0.2.1-alpha9"
-    "@abacus-network/core" "^0.2.1-alpha9"
-    "@abacus-network/sdk" "^0.2.1-alpha9"
-    "@abacus-network/utils" "^0.2.1-alpha9"
+    "@abacus-network/app" "^0.2.1-alpha11"
+    "@abacus-network/core" "^0.2.1-alpha11"
+    "@abacus-network/sdk" "^0.2.1-alpha11"
+    "@abacus-network/utils" "^0.2.1-alpha11"
     "@types/debug" "^4.1.7"
     "@types/yargs" "^17.0.10"
     axios "^0.21.3"
     debug "^4.3.4"
     yargs "^17.4.1"
 
-"@abacus-network/hardhat@^0.2.1-alpha9":
-  version "0.2.1-alpha9"
-  resolved "https://registry.yarnpkg.com/@abacus-network/hardhat/-/hardhat-0.2.1-alpha9.tgz#8b286c41f7e9a5bc2be9f231a30064e93e12a86c"
-  integrity sha512-bGnV5wt4LLUoI6M8Uj8+3kmZyi+gwbY74H4BPNJfpxDFxeqfmnrEXr4MhpSpSUxQcKE/kxoYxGcFmHvgqgvGfg==
+"@abacus-network/hardhat@^0.2.1-alpha11":
+  version "0.2.1-alpha11"
+  resolved "https://registry.yarnpkg.com/@abacus-network/hardhat/-/hardhat-0.2.1-alpha11.tgz#bd3159a4adf62f568e0e3327e39937e3258dfeb0"
+  integrity sha512-yrkbtoU2781Q3kXf6wAJS8BHxVGvnHVgGLmq/SG7hNZuOoZe+u2jXkGuqNx/4Yp/i78EhDeRvKOZrGV0NYl6Ew==
   dependencies:
-    "@abacus-network/core" "^0.2.1-alpha9"
-    "@abacus-network/deploy" "^0.2.1-alpha9"
-    "@abacus-network/sdk" "^0.2.1-alpha9"
-    "@abacus-network/utils" "^0.2.1-alpha9"
+    "@abacus-network/core" "^0.2.1-alpha11"
+    "@abacus-network/deploy" "^0.2.1-alpha11"
+    "@abacus-network/sdk" "^0.2.1-alpha11"
+    "@abacus-network/utils" "^0.2.1-alpha11"
     "@nomiclabs/hardhat-ethers" "^2.0.5"
     "@nomiclabs/hardhat-waffle" "^2.0.2"
     ethereum-waffle "^3.2.2"
@@ -53,22 +53,22 @@
     ts-node "^10.8.0"
     typescript "^4.7.2"
 
-"@abacus-network/sdk@^0.2.1-alpha9":
-  version "0.2.1-alpha9"
-  resolved "https://registry.yarnpkg.com/@abacus-network/sdk/-/sdk-0.2.1-alpha9.tgz#176e61a0fa15c8c11fe9af91683ab6790bfdb77c"
-  integrity sha512-i8aq4NxW3UJzia+smLQkOYQxKNfk8n9p4QyEjzNbWh26rdIXh4bbQcFzochUf4R55VrOwIq4t3Q7gj0aZbMPWw==
+"@abacus-network/sdk@^0.2.1-alpha11":
+  version "0.2.1-alpha11"
+  resolved "https://registry.yarnpkg.com/@abacus-network/sdk/-/sdk-0.2.1-alpha11.tgz#4541c1f131725441f20e6bcaaaef59275697e6e8"
+  integrity sha512-jXUXGqeqQeI+fLqw836Py0vhu8JtGPHR9tCEHVzH9QHiHqaU7uuzQuF9k1DjeDQoPlN77HU+MbedDIUW6kp6dg==
   dependencies:
-    "@abacus-network/core" "^0.2.1-alpha9"
-    "@abacus-network/utils" "^0.2.1-alpha9"
+    "@abacus-network/core" "^0.2.1-alpha11"
+    "@abacus-network/utils" "^0.2.1-alpha11"
     "@ethersproject/bignumber" "^5.5.0"
     "@ethersproject/bytes" "^5.5.0"
     celo-ethers-provider "^0.0.0"
     ethers "^5.4.7"
 
-"@abacus-network/utils@^0.2.1-alpha9":
-  version "0.2.1-alpha9"
-  resolved "https://registry.yarnpkg.com/@abacus-network/utils/-/utils-0.2.1-alpha9.tgz#7bdc572ead99038c5a10968f48f554847ca30db3"
-  integrity sha512-TU2SBQXizitkHPGWleSUsiPpuQ/3Ech/xe00EZXQPbM5ltSI/mmig/NRFIl9gwCCzHvmrzGkv7bOqywmdvk2vA==
+"@abacus-network/utils@^0.2.1-alpha11":
+  version "0.2.1-alpha11"
+  resolved "https://registry.yarnpkg.com/@abacus-network/utils/-/utils-0.2.1-alpha11.tgz#a78d4978975af1fb7a4810141ba15437b8761443"
+  integrity sha512-jHnGGg9reTtMXmPWC4PLGy9wZVWu3YyuU6dySSeapMavq5wIpbEyroFKcUFxfmfPT1bEoIMJULakK9/OEn5jsw==
   dependencies:
     chai "^4.3.0"
     ethers "^5.4.7"

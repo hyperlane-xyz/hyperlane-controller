@@ -1,19 +1,10 @@
-import { ControllerContracts } from '.';
-import { Call } from '..';
+import { ControllerContracts } from './config';
 import { ethers } from 'ethers';
 
 import { types } from '@abacus-network/utils';
 
-import { AbacusApp } from '../app';
-import { MultiProvider } from '../provider';
-import { ChainMap, ChainName, ChainNameToDomainId } from '../types';
-import { objMap, promiseObjAll } from '../utils';
-
-import { ControllerAddresses } from './contracts';
-import { environments } from './environments';
-
-type Environments = typeof environments;
-type EnvironmentName = keyof Environments;
+import { AbacusApp, ChainMap, ChainName, ChainNameToDomainId, MultiProvider, objMap, promiseObjAll } from '@abacus-network/sdk';
+import { Call } from './utils';
 
 export type Controller = {
   domain: number;
@@ -23,34 +14,18 @@ export type Controller = {
 export class ControllerApp<
   Chain extends ChainName = ChainName,
 > extends AbacusApp<ControllerContracts, Chain> {
-  constructor(
-    addresses: ChainMap<Chain, ControllerAddresses>,
-    multiProvider: MultiProvider<Chain>,
-  ) {
-    super(ControllerContracts, addresses, multiProvider);
-  }
+  calls: ChainMap<Chain, Call[]>
 
-  static fromEnvironment(
-    name: EnvironmentName,
-    multiProvider: MultiProvider<any>,
-  ) {
-    return new ControllerApp(environments[name], multiProvider);
+  constructor(contractsMap: ChainMap<Chain, ControllerContracts>, multiProvider: MultiProvider<Chain>) {
+    super(contractsMap, multiProvider)
+    this.calls = objMap(contractsMap, () => [])
   }
 
   pushCall(chain: Chain, call: Call) {
-    this.get(chain).push(call);
+    this.calls[chain].push(call);
   }
 
-  getCalls(chain: Chain) {
-    return this.get(chain).calls;
-  }
-
-  chainCalls = () =>
-    Object.fromEntries(
-      this.chains().map((chain) => [chain, this.getCalls(chain)]),
-    ) as ChainMap<Chain, Call[]>;
-
-  routers = () => objMap(this.contractsMap, (_, d) => d.contracts.router);
+  routers = () => objMap(this.contractsMap, (_, d) => d.router.contract);
 
   routerAddresses = () => objMap(this.routers(), (_, r) => r.address);
 
@@ -75,7 +50,7 @@ export class ControllerApp<
     const controllerRouter = this.routers()[controller.chain];
 
     const chainTransactions = await promiseObjAll(
-      objMap(this.chainCalls(), (chain, calls) => {
+      objMap(this.calls, (chain, calls) => {
         if (chain === controller.chain) {
           return controllerRouter.populateTransaction.call(calls);
         } else {

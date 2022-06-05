@@ -16,8 +16,9 @@ import { utils } from "@abacus-network/utils";
 
 import { ControllerRouter, TestSet, TestSet__factory } from "./types";
 
-import { ControllerConfig, ControllerDeploy } from "./lib/ControllerDeploy";
-import { formatCall, increaseTimestampBy } from "./lib/utils";
+import { ControllerDeployer } from "./deploy";
+import { formatCall, increaseTimestampBy } from "./utils";
+import { controllerFactories } from "./config";
 
 const recoveryTimelock = 60 * 60 * 24 * 7;
 const chains: TestChainNames[] = ["test1", "test2", "test3"];
@@ -33,7 +34,7 @@ describe("ControllerRouter", async () => {
     router: ControllerRouter,
     remote: ControllerRouter,
     testSet: TestSet,
-    controllerDeploy: ControllerDeploy,
+    controllerDeploy: ControllerDeployer<TestChainNames>,
     outbox: Outbox,
     interchainGasPaymaster: InterchainGasPaymaster,
     multiProvider: MultiProvider<TestChainNames>,
@@ -50,31 +51,21 @@ describe("ControllerRouter", async () => {
     const testSetFactory = new TestSet__factory(controller);
     testSet = await testSetFactory.deploy();
 
-    const controllerConfig = objMap(core.contractsMap, (_, coreContracts) => {
-      const config: ControllerConfig = {
-        timelock: recoveryTimelock,
+    const controllerConfig = objMap(core.contractsMap, (chain) => ({
+        recoveryTimelock,
         recoveryManager: recoveryManager.address,
-        controller: {
-          chain: localChain,
-          address: controller.address,
-        },
-        abacusConnectionManager:
-          coreContracts.addresses.abacusConnectionManager,
-      };
-      return config;
-    });
+        owner: chain === localChain ? controller.address : ethers.constants.AddressZero
+      })
+    );
 
-    controllerDeploy = new ControllerDeploy(multiProvider, controllerConfig);
+    controllerDeploy = new ControllerDeployer(multiProvider, core.extendWithConnectionManagers(controllerConfig), controllerFactories);
   });
 
   beforeEach(async () => {
-    const addresses = await controllerDeploy.deploy();
-    router = controllerDeploy.mustGetRouter(localChain, addresses[localChain]);
-    remote = controllerDeploy.mustGetRouter(
-      remoteChain,
-      addresses[remoteChain]
-    );
-    outbox = core.getContracts(localChain).outbox.outbox;
+    const contractsMap = await controllerDeploy.deploy();
+    router = contractsMap[localChain].router.contract
+    remote = contractsMap[remoteChain].router.contract
+    outbox = core.getContracts(localChain).outbox.contract;
     interchainGasPaymaster =
       core.getContracts(localChain).interchainGasPaymaster;
   });
@@ -150,15 +141,6 @@ describe("ControllerRouter", async () => {
         .withArgs(leafIndex, testInterchainGasPayment);
     });
 
-    it("creates a checkpoint for remote calls", async () => {
-      const value = 13;
-      const call = formatCall(testSet, "set", [value]);
-      await expect(await router.callRemote(remoteDomain, [call])).to.emit(
-        outbox,
-        "Checkpoint"
-      );
-    });
-
     it("controller can set remote controller", async () => {
       const newController = controller.address;
       expect(await remote.controller()).to.not.equal(newController);
@@ -177,13 +159,6 @@ describe("ControllerRouter", async () => {
       )
         .to.emit(interchainGasPaymaster, "GasPayment")
         .withArgs(leafIndex, testInterchainGasPayment);
-    });
-
-    it("creates a checkpoint when setting a remote controller", async () => {
-      const newController = controller.address;
-      await expect(
-        router.setControllerRemote(remoteDomain, newController)
-      ).to.emit(outbox, "Checkpoint");
     });
 
     it("controller can set remote abacusConnectionManager", async () => {
@@ -214,15 +189,6 @@ describe("ControllerRouter", async () => {
         .withArgs(leafIndex, testInterchainGasPayment);
     });
 
-    it("creates a checkpoint when setting a remote abacusConnectionManager", async () => {
-      await expect(
-        router.setAbacusConnectionManagerRemote(
-          remoteDomain,
-          ethers.constants.AddressZero
-        )
-      ).to.emit(outbox, "Checkpoint");
-    });
-
     it("controller can enroll remote remote router", async () => {
       expect(await remote.routers(testDomain)).to.equal(
         ethers.constants.HashZero
@@ -247,13 +213,6 @@ describe("ControllerRouter", async () => {
       )
         .to.emit(interchainGasPaymaster, "GasPayment")
         .withArgs(leafIndex, testInterchainGasPayment);
-    });
-
-    it("creates a checkpoint when enrolling a remote router", async () => {
-      const newRouter = utils.addressToBytes32(router.address);
-      await expect(
-        router.enrollRemoteRouterRemote(remoteDomain, testDomain, newRouter)
-      ).to.emit(outbox, "Checkpoint");
     });
 
     it("controller cannot initiate recovery", async () => {
