@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 
 import { types, utils } from '@abacus-network/utils';
-import { canonizeId } from '@abacus-network/sdk/dist/utils';
+import { utils as sdkUtils } from '@abacus-network/sdk';
 
 export enum ControllerMessage {
   CALL = 1,
@@ -129,7 +129,7 @@ export function serializeCall(call: Call): string {
 }
 
 export function normalizeCall(partial: Partial<Call>): Readonly<Call> {
-  const to = ethers.utils.hexlify(canonizeId(partial.to!));
+  const to = ethers.utils.hexlify(sdkUtils.canonizeId(partial.to!));
   const data = partial.data ?? '0x';
 
   return Object.freeze({

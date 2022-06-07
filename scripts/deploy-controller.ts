@@ -50,4 +50,4 @@ async function main() {
   console.log(serializeContracts(contracts))
 }
 
-main().then(console.log).catch(console.error);
+main().catch(console.error);
