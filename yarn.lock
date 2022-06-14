@@ -2,7 +2,16 @@
 # yarn lockfile v1
 
 
-"@abacus-network/app@^0.2.1", "@abacus-network/app@https://github.com/abacus-network/abacus-monorepo/blob/router%3C0.8/solidity/app/package.tgz?raw=true":
+"@abacus-network/app@^0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@abacus-network/app/-/app-0.2.2.tgz#0373940bdea81e545edc4d37110380f0eae84de4"
+  integrity sha512-CcMcFCOdEq2N2dE9GQqcjE1PZP/G7e8zX+wBMdHdEtMfKLe0D2NDSgcvU/0CyrFkK/teTthhvE48KuggLubC0Q==
+  dependencies:
+    "@abacus-network/core" "^0.2.2"
+    "@abacus-network/utils" "^0.2.2"
+    "@openzeppelin/contracts-upgradeable" "^4.5.0"
+
+"@abacus-network/app@https://github.com/abacus-network/abacus-monorepo/blob/router%3C0.8/solidity/app/package.tgz?raw=true":
   version "0.2.1"
   resolved "https://github.com/abacus-network/abacus-monorepo/blob/router%3C0.8/solidity/app/package.tgz?raw=true#58df50b03fc61c7bad0afe14c20069b8f799b083"
   dependencies:
@@ -10,62 +19,62 @@
     "@abacus-network/utils" "^0.2.1"
     "@openzeppelin/contracts-upgradeable" "~3.4.2"
 
-"@abacus-network/core@^0.2.1":
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/@abacus-network/core/-/core-0.2.1.tgz#5bfe82dac33d3ab7bc384037e386e43bce79cd2b"
-  integrity sha512-3Ghb+FUGu6FoWRVh50DS85zq/i7AyL1FH9yn88sXhotU8Pmx0hbT0hhBng75UteP85OLPu+q37JcG3/D0PVafw==
+"@abacus-network/core@^0.2.1", "@abacus-network/core@^0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@abacus-network/core/-/core-0.2.2.tgz#5236845f0555a1d5bec5951528ed1ccf78c797b6"
+  integrity sha512-E+njl87Oc3X8q2UzMgSQeVwUeFOIQyTxnahe4MztF4E0Q6AqGt6bi8ROH5cMxOYA7UKD+vu1ESW2hvmqIdcY8Q==
   dependencies:
-    "@abacus-network/utils" "^0.2.1"
+    "@abacus-network/utils" "^0.2.2"
     "@openzeppelin/contracts" "^4.6.0"
     "@openzeppelin/contracts-upgradeable" "^4.6.0"
     "@summa-tx/memview-sol" "^2.0.0"
 
-"@abacus-network/deploy@^0.2.1":
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/@abacus-network/deploy/-/deploy-0.2.1.tgz#82d34f87f60be7d4d3eebfdf8fdeded8c4554515"
-  integrity sha512-NRhVPNeI4rOoSXQEf1bdnuNIV3J9KVe+Rt/vhbaV/hsD7CeytK0fafFGMtFLZq/6BhrR2Ho82TH8PYeHfYGztg==
+"@abacus-network/deploy@^0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@abacus-network/deploy/-/deploy-0.2.2.tgz#3c1f8105518e03f806e675a545ac1b8532c39894"
+  integrity sha512-ol6hcfUXsPCbyHKSUuG9nY8T0HSFg+LNjxWujuTtGTtAS2+Mr6EjOWXH+QnVXIO9geHjIHFBwaW0a4f4Km9YOA==
   dependencies:
-    "@abacus-network/app" "^0.2.1"
-    "@abacus-network/core" "^0.2.1"
-    "@abacus-network/sdk" "^0.2.1"
-    "@abacus-network/utils" "^0.2.1"
+    "@abacus-network/app" "^0.2.2"
+    "@abacus-network/core" "^0.2.2"
+    "@abacus-network/sdk" "^0.2.2"
+    "@abacus-network/utils" "^0.2.2"
     "@types/debug" "^4.1.7"
     "@types/yargs" "^17.0.10"
     axios "^0.21.3"
     debug "^4.3.4"
     yargs "^17.4.1"
 
-"@abacus-network/hardhat@^0.2.1":
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/@abacus-network/hardhat/-/hardhat-0.2.1.tgz#f890ed7364ed880884b9cd42a76420c142b04e71"
-  integrity sha512-e5WWzKuMwCUgw8D/O0uq/k0gyaY+W2eV0vYQtGphYTM4shWQvk2tayS2GtK/CnA9SGDr+YRRPCcEiFkFDDDfEQ==
+"@abacus-network/hardhat@^0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@abacus-network/hardhat/-/hardhat-0.2.2.tgz#485c0dce0d176fc842ef0fadaaf659584c216e29"
+  integrity sha512-Zsx9AgTQQ3VRP5MXm1vOOBRtxmMpxk7UnWNsp8vk6HVL7+alTKB+r9gTjGgFfqJlVCJV34bajp9mjfDPPX9K8Q==
   dependencies:
-    "@abacus-network/core" "^0.2.1"
-    "@abacus-network/deploy" "^0.2.1"
-    "@abacus-network/sdk" "^0.2.1"
-    "@abacus-network/utils" "^0.2.1"
+    "@abacus-network/core" "^0.2.2"
+    "@abacus-network/deploy" "^0.2.2"
+    "@abacus-network/sdk" "^0.2.2"
+    "@abacus-network/utils" "^0.2.2"
     "@nomiclabs/hardhat-ethers" "^2.0.5"
     "@nomiclabs/hardhat-waffle" "^2.0.2"
     ethereum-waffle "^3.2.2"
     ethers "^5.4.7"
     hardhat "^2.8.4"
 
-"@abacus-network/sdk@^0.2.1":
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/@abacus-network/sdk/-/sdk-0.2.1.tgz#b0f77f6784f0efa7df6c562a93d43ce0f734fae7"
-  integrity sha512-7+gZmzwBlAsNlW94zvxcSnOW3YilCcpPF9MeUcDvSyifaVE3tIRk4s0im3dq1Vvaul2G15/pdFi/ptxcp9w9gw==
+"@abacus-network/sdk@^0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@abacus-network/sdk/-/sdk-0.2.2.tgz#8acb13c085555d3255389f7f234d05871689f079"
+  integrity sha512-BWkTczqTjdgxT1CF4sM/xq8mSe/dXZvFZwM2b5Qgni4wfbGju3ZJEF0fNl8RiUdkAvnZZ7vjvJ8P3RLYFZam7A==
   dependencies:
-    "@abacus-network/core" "^0.2.1"
-    "@abacus-network/utils" "^0.2.1"
+    "@abacus-network/core" "^0.2.2"
+    "@abacus-network/utils" "^0.2.2"
     "@ethersproject/bignumber" "^5.5.0"
     "@ethersproject/bytes" "^5.5.0"
     celo-ethers-provider "^0.0.0"
     ethers "^5.4.7"
 
-"@abacus-network/utils@^0.2.1":
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/@abacus-network/utils/-/utils-0.2.1.tgz#1f601bc24dbdc201347b806fb26cab8f0ca8e079"
-  integrity sha512-zcIG/YB1MJiVTQDKkvUTnigypETLlbu6DBYVwiCHq0OOZzDUsOjGKMC/vPA5aLWLV1bTsLMndysgjP8V5QZXHQ==
+"@abacus-network/utils@^0.2.1", "@abacus-network/utils@^0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@abacus-network/utils/-/utils-0.2.2.tgz#b2a9f876a51de7651f685380c2b9bed0b771f079"
+  integrity sha512-+GkKsN4gGCe0udWgqHadlOWI+R+EkeTXtcg+g7pxfz63+ENtFY+Or3cssXD0GBR4b9kuuoq+JUs/ka+irtVIAg==
   dependencies:
     chai "^4.3.0"
     ethers "^5.4.7"
@@ -716,7 +725,7 @@
     "@types/sinon-chai" "^3.2.3"
     "@types/web3" "1.0.19"
 
-"@openzeppelin/contracts-upgradeable@^4.6.0":
+"@openzeppelin/contracts-upgradeable@^4.5.0", "@openzeppelin/contracts-upgradeable@^4.6.0":
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts-upgradeable/-/contracts-upgradeable-4.6.0.tgz#1bf55f230f008554d4c6fe25eb165b85112108b0"
   integrity sha512-5OnVuO4HlkjSCJO165a4i2Pu1zQGzMs//o54LPrwUgxvEO2P3ax1QuaSI0cEHHTveA77guS0PnNugpR2JMsPfA==
@@ -930,10 +939,10 @@
   resolved "https://registry.yarnpkg.com/@tsconfig/node16/-/node16-1.0.3.tgz#472eaab5f15c1ffdd7f8628bd4c4f753995ec79e"
   integrity sha512-yOlFc+7UtL/89t2ZhjPvvB/DeAr3r+Dq58IgzsFkOAvVC6NMJXmCGjbptdXdR9qsX7pKcTL+s87FtYREi2dEEQ==
 
-"@typechain/ethers-v5@^10.0.0":
-  version "10.1.0"
-  resolved "https://registry.yarnpkg.com/@typechain/ethers-v5/-/ethers-v5-10.1.0.tgz#068d7dc7014502354696dab59590a7841091e951"
-  integrity sha512-3LIb+eUpV3mNCrjUKT5oqp8PBsZYSnVrkfk6pY/ZM0boRs2mKxjFZ7bktx42vfDye8PPz3NxtW4DL5NsNsFqlg==
+"@typechain/ethers-v5@10.0.0":
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/@typechain/ethers-v5/-/ethers-v5-10.0.0.tgz#1b6e292d2ed9afb0d2f7a4674cc199bb95bad714"
+  integrity sha512-Kot7fwAqnH96ZbI8xrRgj5Kpv9yCEdjo7mxRqrH7bYpEgijT5MmuOo8IVsdhOu7Uog4ONg7k/d5UdbAtTKUgsA==
   dependencies:
     lodash "^4.17.15"
     ts-essentials "^7.0.1"
@@ -945,12 +954,10 @@
   dependencies:
     ethers "^5.0.2"
 
-"@typechain/hardhat@^2.0.1":
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/@typechain/hardhat/-/hardhat-2.3.1.tgz#1e8a6e3795e115a5d5348526282b5c597fab0b78"
-  integrity sha512-BQV8OKQi0KAzLXCdsPO0pZBNQQ6ra8A2ucC26uFX/kquRBtJu1yEyWnVSmtr07b5hyRoJRpzUeINLnyqz4/MAw==
-  dependencies:
-    fs-extra "^9.1.0"
+"@typechain/hardhat@2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@typechain/hardhat/-/hardhat-2.0.1.tgz#93ddf1ff3a03ca2112c5f20aac598d3faae4d54b"
+  integrity sha512-R5q9M9IDYIs9fgqz9zEJrAVKE5N9HOMhhvrr81oSEZvoHkI8NZrr6pLWsqdifYqHnT00ww6ZxllPIrBjW1qnxA==
 
 "@types/abstract-leveldown@*":
   version "7.2.0"
@@ -1578,11 +1585,6 @@ asynckit@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
   integrity sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==
-
-at-least-node@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/at-least-node/-/at-least-node-1.0.0.tgz#602cd4b46e844ad4effc92a8011a3c46e0238dc2"
-  integrity sha512-+q/t7Ekv1EDY2l6Gda6LLiX14rU9TV20Wa3ofeQmwPFZbOMo9DXrLbOjFaaclkXKWidIaopwAObQDqwWtGUjqg==
 
 atob@^2.1.2:
   version "2.1.2"
@@ -3293,9 +3295,9 @@ ee-first@1.1.1:
   integrity sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==
 
 electron-to-chromium@^1.3.47:
-  version "1.4.154"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.154.tgz#d69c60499fc467a6c59591d29183e520afbc78a1"
-  integrity sha512-GbV9djOkrnj6xmW+YYVVEI3VCQnJ0pnSTu7TW2JyjKd5cakoiSaG5R4RbEtfaD92GsY10DzbU3GYRe+IOA9kqA==
+  version "1.4.155"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.155.tgz#9c7190bf5e8608c5a5e4953b1ccf0facf3d1b49d"
+  integrity sha512-niPzKBSYPG06gxLKO0c2kEmgdRMTtIbNrBlvD31Ld8Q57b/K0218U4j8u/OOt25XE1eFOn47FcmQVdx9R1qqxA==
 
 elliptic@6.5.4, elliptic@^6.4.0, elliptic@^6.5.2, elliptic@^6.5.3, elliptic@^6.5.4:
   version "6.5.4"
@@ -4619,16 +4621,6 @@ fs-extra@^8.1.0:
     jsonfile "^4.0.0"
     universalify "^0.1.0"
 
-fs-extra@^9.1.0:
-  version "9.1.0"
-  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-9.1.0.tgz#5954460c764a8da2094ba3554bf839e6b9a7c86d"
-  integrity sha512-hcg3ZmepS30/7BSFqRvoo3DOMQu7IjqxO5nCDt+zM9XWjb33Wg7ziNT+Qvqbuc3+gWpzO02JubVyk2G4Zvo1OQ==
-  dependencies:
-    at-least-node "^1.0.0"
-    graceful-fs "^4.2.0"
-    jsonfile "^6.0.1"
-    universalify "^2.0.0"
-
 fs-minipass@^1.2.7:
   version "1.2.7"
   resolved "https://registry.yarnpkg.com/fs-minipass/-/fs-minipass-1.2.7.tgz#ccff8570841e7fe4265693da88936c55aed7f7c7"
@@ -5920,15 +5912,6 @@ jsonfile@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/jsonfile/-/jsonfile-4.0.0.tgz#8771aae0799b64076b76640fca058f9c10e33ecb"
   integrity sha512-m6F1R3z8jjlf2imQHS2Qez5sjKWQzbuuhuJ/FKYFRZvPE3PuHcSMVZzfsLhGVOkfd20obL5SWEBew5ShlquNxg==
-  optionalDependencies:
-    graceful-fs "^4.1.6"
-
-jsonfile@^6.0.1:
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/jsonfile/-/jsonfile-6.1.0.tgz#bc55b2634793c679ec6403094eb13698a6ec0aae"
-  integrity sha512-5dgndWOriYSm5cnYaJNhalLNDKOqFwyDB/rr1E9ZsGciGvKPs8R2xYGCacuf3z6K1YKDz182fd+fY3cn3pMqXQ==
-  dependencies:
-    universalify "^2.0.0"
   optionalDependencies:
     graceful-fs "^4.1.6"
 
@@ -9200,6 +9183,22 @@ type@^2.5.0:
   resolved "https://registry.yarnpkg.com/type/-/type-2.6.0.tgz#3ca6099af5981d36ca86b78442973694278a219f"
   integrity sha512-eiDBDOmkih5pMbo9OqsqPRGMljLodLcwd5XD5JbtNB0o89xZAwynY9EdCDsJU7LtcVCClu9DvM7/0Ep1hYX3EQ==
 
+typechain@8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/typechain/-/typechain-8.0.0.tgz#a5dbe754717a7e16247df52b5285903de600e8ff"
+  integrity sha512-rqDfDYc9voVAhmfVfAwzg3VYFvhvs5ck1X9T/iWkX745Cul4t+V/smjnyqrbDzWDbzD93xfld1epg7Y/uFAesQ==
+  dependencies:
+    "@types/prettier" "^2.1.1"
+    debug "^4.3.1"
+    fs-extra "^7.0.0"
+    glob "7.1.7"
+    js-sha3 "^0.8.0"
+    lodash "^4.17.15"
+    mkdirp "^1.0.4"
+    prettier "^2.3.1"
+    ts-command-line-args "^2.2.0"
+    ts-essentials "^7.0.1"
+
 typechain@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/typechain/-/typechain-3.0.0.tgz#d5a47700831f238e43f7429b987b4bb54849b92e"
@@ -9212,22 +9211,6 @@ typechain@^3.0.0:
     lodash "^4.17.15"
     ts-essentials "^6.0.3"
     ts-generator "^0.1.1"
-
-typechain@^8.0.0:
-  version "8.1.0"
-  resolved "https://registry.yarnpkg.com/typechain/-/typechain-8.1.0.tgz#fc4902ce596519cb2ccfd012e4ddf92a9945b569"
-  integrity sha512-5jToLgKTjHdI1VKqs/K8BLYy42Sr3o8bV5ojh4MnR9ExHO83cyyUdw+7+vMJCpKXUiVUvARM4qmHTFuyaCMAZQ==
-  dependencies:
-    "@types/prettier" "^2.1.1"
-    debug "^4.3.1"
-    fs-extra "^7.0.0"
-    glob "7.1.7"
-    js-sha3 "^0.8.0"
-    lodash "^4.17.15"
-    mkdirp "^1.0.4"
-    prettier "^2.3.1"
-    ts-command-line-args "^2.2.0"
-    ts-essentials "^7.0.1"
 
 typedarray-to-buffer@^3.1.5:
   version "3.1.5"
@@ -9322,11 +9305,6 @@ universalify@^0.1.0:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/universalify/-/universalify-0.1.2.tgz#b646f69be3942dabcecc9d6639c80dc105efaa66"
   integrity sha512-rBJeI5CXAlmy1pV+617WB9J63U6XcazHHF2f2dbJix4XzpUF0RS3Zbj0FGIOCAva5P/d/GBOYaACQ1w+0azUkg==
-
-universalify@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/universalify/-/universalify-2.0.0.tgz#75a4984efedc4b08975c5aeb73f530d02df25717"
-  integrity sha512-hAZsKq7Yy11Zu1DE0OzWjw7nnLZmJZYTDZZyEFHZdUhV8FkH5MCfoU1XMaxXovpyW5nq5scPqq0ZDP9Zyl04oQ==
 
 unorm@^1.3.3:
   version "1.6.0"

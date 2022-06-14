@@ -1,6 +1,12 @@
 import { AbacusRouterDeployer, RouterConfig } from "@abacus-network/deploy";
 import { DeployerOptions } from "@abacus-network/deploy/dist/src/deploy";
-import { ChainMap, ChainName, MultiProvider, objMap, promiseObjAll } from "@abacus-network/sdk";
+import {
+  ChainMap,
+  ChainName,
+  MultiProvider,
+  objMap,
+  promiseObjAll,
+} from "@abacus-network/sdk";
 import {
   ControllerConfig,
   ControllerContracts,
@@ -14,10 +20,14 @@ export class ControllerDeployer<
   Chain,
   ControllerContracts,
   ControllerFactories,
-  ControllerContracts
+  ControllerConfig
 > {
-  constructor(multiProvider: MultiProvider<Chain>, configMap: ChainMap<Chain, ControllerConfig & RouterConfig>, options?: DeployerOptions) {
-    super(multiProvider, configMap, controllerFactories, options)
+  constructor(
+    multiProvider: MultiProvider<Chain>,
+    configMap: ChainMap<Chain, ControllerConfig & RouterConfig>,
+    options?: DeployerOptions
+  ) {
+    super(multiProvider, configMap, controllerFactories, options);
   }
 
   async deployContracts(
@@ -46,7 +56,7 @@ export class ControllerDeployer<
     );
 
     return {
-      router: router,
+      router: router.contract,
       upgradeBeaconController: upgradeBeaconController,
     };
   }
@@ -57,10 +67,9 @@ export class ControllerDeployer<
     // Transfer ownership of routers to controller and recovery manager.
     await promiseObjAll(
       objMap(contractsMap, async (local, contracts) => {
-        const router = contracts.router.contract;
         const config = this.configMap[local];
-        await router.transferOwnership(config.recoveryManager);
-        await router.setController(config.owner);
+        await contracts.router.transferOwnership(config.recoveryManager);
+        await contracts.router.setController(config.owner);
       })
     );
 

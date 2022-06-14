@@ -2,7 +2,6 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 
-import { InterchainGasPaymaster, Outbox } from "@abacus-network/core";
 import { hardhatMultiProvider } from "@abacus-network/hardhat";
 import { TestCoreApp } from "@abacus-network/hardhat/dist/src/TestCoreApp";
 import { TestCoreDeploy } from "@abacus-network/hardhat/dist/src/TestCoreDeploy";
@@ -34,11 +33,10 @@ describe("ControllerRouter", async () => {
     remote: ControllerRouter,
     testSet: TestSet,
     controllerDeploy: ControllerDeployer<TestChainNames>,
-    outbox: Outbox,
-    interchainGasPaymaster: InterchainGasPaymaster,
+    // interchainGasPaymaster: InterchainGasPaymaster,
     multiProvider: MultiProvider<TestChainNames>,
     core: TestCoreApp;
-  const testInterchainGasPayment = 123456789;
+  // const testInterchainGasPayment = 123456789;
 
   before(async () => {
     [controller, recoveryManager] = await ethers.getSigners();
@@ -51,22 +49,26 @@ describe("ControllerRouter", async () => {
     testSet = await testSetFactory.deploy();
 
     const controllerConfig = objMap(core.contractsMap, (chain) => ({
-        recoveryTimelock,
-        recoveryManager: recoveryManager.address,
-        owner: chain === localChain ? controller.address : ethers.constants.AddressZero
-      })
-    );
+      recoveryTimelock,
+      recoveryManager: recoveryManager.address,
+      owner:
+        chain === localChain
+          ? controller.address
+          : ethers.constants.AddressZero,
+    }));
 
-    controllerDeploy = new ControllerDeployer(multiProvider, core.extendWithConnectionManagers(controllerConfig));
+    controllerDeploy = new ControllerDeployer(
+      multiProvider,
+      core.extendWithConnectionManagers(controllerConfig)
+    );
   });
 
   beforeEach(async () => {
     const contractsMap = await controllerDeploy.deploy();
-    router = contractsMap[localChain].router.contract
-    remote = contractsMap[remoteChain].router.contract
-    outbox = core.getContracts(localChain).outbox.contract;
-    interchainGasPaymaster =
-      core.getContracts(localChain).interchainGasPaymaster;
+    router = contractsMap[localChain].router;
+    remote = contractsMap[remoteChain].router;
+    // interchainGasPaymaster =
+    //   core.getContracts(localChain).interchainGasPaymaster;
   });
 
   it("Cannot be initialized twice", async () => {
@@ -127,18 +129,18 @@ describe("ControllerRouter", async () => {
       expect(await testSet.get()).to.equal(value);
     });
 
-    it("allows interchain gas payment for remote calls", async () => {
-      const leafIndex = await outbox.count();
-      const value = 13;
-      const call = formatCall(testSet, "set", [value]);
-      await expect(
-        await router.callRemote(remoteDomain, [call], {
-          value: testInterchainGasPayment,
-        })
-      )
-        .to.emit(interchainGasPaymaster, "GasPayment")
-        .withArgs(leafIndex, testInterchainGasPayment);
-    });
+    // it("allows interchain gas payment for remote calls", async () => {
+    //   const leafIndex = await outbox.count();
+    //   const value = 13;
+    //   const call = formatCall(testSet, "set", [value]);
+    //   await expect(
+    //     await router.callRemote(remoteDomain, [call], {
+    //       value: testInterchainGasPayment,
+    //     })
+    //   )
+    //     .to.emit(interchainGasPaymaster, "GasPayment")
+    //     .withArgs(leafIndex, testInterchainGasPayment);
+    // });
 
     it("controller can set remote controller", async () => {
       const newController = controller.address;
@@ -148,17 +150,17 @@ describe("ControllerRouter", async () => {
       expect(await remote.controller()).to.equal(newController);
     });
 
-    it("allows interchain gas payment when setting a remote controller", async () => {
-      const newController = controller.address;
-      const leafIndex = await outbox.count();
-      await expect(
-        router.setControllerRemote(remoteDomain, newController, {
-          value: testInterchainGasPayment,
-        })
-      )
-        .to.emit(interchainGasPaymaster, "GasPayment")
-        .withArgs(leafIndex, testInterchainGasPayment);
-    });
+    // it("allows interchain gas payment when setting a remote controller", async () => {
+    //   const newController = controller.address;
+    //   const leafIndex = await outbox.count();
+    //   await expect(
+    //     router.setControllerRemote(remoteDomain, newController, {
+    //       value: testInterchainGasPayment,
+    //     })
+    //   )
+    //     .to.emit(interchainGasPaymaster, "GasPayment")
+    //     .withArgs(leafIndex, testInterchainGasPayment);
+    // });
 
     it("controller can set remote abacusConnectionManager", async () => {
       const newConnectionManager = ethers.constants.AddressZero;
@@ -175,18 +177,18 @@ describe("ControllerRouter", async () => {
       );
     });
 
-    it("allows interchain gas payment when setting a remote abacusConnectionManager", async () => {
-      const leafIndex = await outbox.count();
-      await expect(
-        router.setAbacusConnectionManagerRemote(
-          remoteDomain,
-          ethers.constants.AddressZero,
-          { value: testInterchainGasPayment }
-        )
-      )
-        .to.emit(interchainGasPaymaster, "GasPayment")
-        .withArgs(leafIndex, testInterchainGasPayment);
-    });
+    // it("allows interchain gas payment when setting a remote abacusConnectionManager", async () => {
+    //   const leafIndex = await outbox.count();
+    //   await expect(
+    //     router.setAbacusConnectionManagerRemote(
+    //       remoteDomain,
+    //       ethers.constants.AddressZero,
+    //       { value: testInterchainGasPayment }
+    //     )
+    //   )
+    //     .to.emit(interchainGasPaymaster, "GasPayment")
+    //     .withArgs(leafIndex, testInterchainGasPayment);
+    // });
 
     it("controller can enroll remote remote router", async () => {
       expect(await remote.routers(testDomain)).to.equal(
@@ -202,17 +204,17 @@ describe("ControllerRouter", async () => {
       expect(await remote.routers(testDomain)).to.equal(newRouter);
     });
 
-    it("allows interchain gas payment when enrolling a remote router", async () => {
-      const leafIndex = await outbox.count();
-      const newRouter = utils.addressToBytes32(router.address);
-      await expect(
-        router.enrollRemoteRouterRemote(remoteDomain, testDomain, newRouter, {
-          value: testInterchainGasPayment,
-        })
-      )
-        .to.emit(interchainGasPaymaster, "GasPayment")
-        .withArgs(leafIndex, testInterchainGasPayment);
-    });
+    // it("allows interchain gas payment when enrolling a remote router", async () => {
+    //   const leafIndex = await outbox.count();
+    //   const newRouter = utils.addressToBytes32(router.address);
+    //   await expect(
+    //     router.enrollRemoteRouterRemote(remoteDomain, testDomain, newRouter, {
+    //       value: testInterchainGasPayment,
+    //     })
+    //   )
+    //     .to.emit(interchainGasPaymaster, "GasPayment")
+    //     .withArgs(leafIndex, testInterchainGasPayment);
+    // });
 
     it("controller cannot initiate recovery", async () => {
       await expect(router.initiateRecoveryTimelock()).to.be.revertedWith(

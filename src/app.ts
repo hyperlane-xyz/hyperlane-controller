@@ -1,10 +1,18 @@
-import { ControllerContracts } from './config';
-import { ethers } from 'ethers';
+import { ethers } from "ethers";
+import { ControllerContracts } from "./config";
 
-import { types } from '@abacus-network/utils';
+import { types } from "@abacus-network/utils";
 
-import { AbacusApp, ChainMap, ChainName, ChainNameToDomainId, MultiProvider, objMap, promiseObjAll } from '@abacus-network/sdk';
-import { Call } from './utils';
+import {
+  AbacusApp,
+  ChainMap,
+  ChainName,
+  ChainNameToDomainId,
+  MultiProvider,
+  objMap,
+  promiseObjAll,
+} from "@abacus-network/sdk";
+import { Call } from "./utils";
 
 export type Controller = {
   domain: number;
@@ -12,20 +20,23 @@ export type Controller = {
 };
 
 export class ControllerApp<
-  Chain extends ChainName = ChainName,
+  Chain extends ChainName = ChainName
 > extends AbacusApp<ControllerContracts, Chain> {
-  calls: ChainMap<Chain, Call[]>
+  calls: ChainMap<Chain, Call[]>;
 
-  constructor(contractsMap: ChainMap<Chain, ControllerContracts>, public multiProvider: MultiProvider<Chain>) {
-    super(contractsMap, multiProvider)
-    this.calls = objMap(contractsMap, () => [])
+  constructor(
+    contractsMap: ChainMap<Chain, ControllerContracts>,
+    public multiProvider: MultiProvider<Chain>
+  ) {
+    super(contractsMap, multiProvider);
+    this.calls = objMap(contractsMap, () => []);
   }
 
   pushCall(chain: Chain, call: Call) {
     this.calls[chain].push(call);
   }
 
-  routers = () => objMap(this.chainMap, (_, d) => d.router.contract);
+  routers = () => objMap(this.chainMap, (_, d) => d.router);
 
   routerAddresses = () => objMap(this.routers(), (_, r) => r.address);
 
@@ -34,15 +45,15 @@ export class ControllerApp<
     address: types.Address;
   }> => {
     const controllers = await promiseObjAll(
-      objMap(this.routers(), (_chain, router) => router.controller()),
+      objMap(this.routers(), (_chain, router) => router.controller())
     );
     const match = Object.entries(controllers).find(
-      ([_, controller]) => controller !== ethers.constants.AddressZero,
+      ([_, controller]) => controller !== ethers.constants.AddressZero
     ) as [Chain, types.Address] | undefined;
     if (match) {
       return { chain: match[0], address: match[1] };
     }
-    throw new Error('No controller found');
+    throw new Error("No controller found");
   };
 
   build = async (): Promise<ethers.PopulatedTransaction[]> => {
@@ -52,32 +63,36 @@ export class ControllerApp<
     const chainTransactions = await promiseObjAll(
       objMap(this.calls, (chain, calls) => {
         if (calls.length === 0) {
-          return Promise.resolve(null)
+          return Promise.resolve(null);
         }
         if (chain === controller.chain) {
           return controllerRouter.populateTransaction.call(calls);
         } else {
           return controllerRouter.populateTransaction.callRemote(
             ChainNameToDomainId[chain],
-            calls,
+            calls
           );
         }
-      }),
+      })
     );
-    return Object.values(chainTransactions).filter(x => !!x) as ethers.PopulatedTransaction[];
+    return Object.values(chainTransactions).filter(
+      (x) => !!x
+    ) as ethers.PopulatedTransaction[];
   };
 
   execute = async () => {
     const controller = await this.controller();
-    const chainConnection = this.multiProvider.getChainConnection(controller.chain)
-    const signer = chainConnection.signer
+    const chainConnection = this.multiProvider.getChainConnection(
+      controller.chain
+    );
+    const signer = chainConnection.signer;
     if (!signer) {
-      throw new Error(`No signer for chain ${controller.chain}`)
+      throw new Error(`No signer for chain ${controller.chain}`);
     }
     const signerAddress = await signer.getAddress();
     if (signerAddress !== controller.address) {
       throw new Error(
-        `Signer ${signerAddress} is not the controller ${controller.address}`,
+        `Signer ${signerAddress} is not the controller ${controller.address}`
       );
     }
 
@@ -87,18 +102,20 @@ export class ControllerApp<
       transactions.map(async (tx) => {
         const response = await signer.sendTransaction(tx);
         return response.wait(chainConnection.confirmations);
-      }),
+      })
     );
   };
 
   estimateGas = async (): Promise<ethers.BigNumber[]> => {
     const transactions = await this.build();
     const controller = await this.controller();
-    const provider = this.multiProvider.getChainConnection(controller.chain).provider
+    const provider = this.multiProvider.getChainConnection(
+      controller.chain
+    ).provider;
     return Promise.all(
       transactions.map(
-        (tx) => provider.estimateGas({ ...tx, from: controller.address }), // Estimate gas as the controller
-      ),
+        (tx) => provider.estimateGas({ ...tx, from: controller.address }) // Estimate gas as the controller
+      )
     );
   };
 }

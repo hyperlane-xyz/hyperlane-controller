@@ -3,11 +3,11 @@
   "version": "0.2.1-alpha4",
   "dependencies": {
     "@abacus-network/app": "https://github.com/abacus-network/abacus-monorepo/blob/router%3C0.8/solidity/app/package.tgz?raw=true",
-    "@abacus-network/core": "^0.2.1",
-    "@abacus-network/deploy": "^0.2.1",
-    "@abacus-network/hardhat": "^0.2.1",
-    "@abacus-network/sdk": "^0.2.1",
-    "@abacus-network/utils": "^0.2.1",
+    "@abacus-network/core": "^0.2.2",
+    "@abacus-network/deploy": "^0.2.2",
+    "@abacus-network/hardhat": "^0.2.2",
+    "@abacus-network/sdk": "^0.2.2",
+    "@abacus-network/utils": "^0.2.2",
     "@openzeppelin/contracts": "~3.4.2",
     "@openzeppelin/contracts-upgradeable": "~3.4.2",
     "@summa-tx/memview-sol": "^2.0.0"
@@ -15,8 +15,8 @@
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.1",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
-    "@typechain/ethers-v5": "^10.0.0",
-    "@typechain/hardhat": "^2.0.1",
+    "@typechain/ethers-v5": "10.0.0",
+    "@typechain/hardhat": "2.0.1",
     "@types/mocha": "^9.1.0",
     "chai": "^4.3.0",
     "eslint": "^7.20.0",
@@ -30,7 +30,7 @@
     "solhint-plugin-prettier": "^0.0.5",
     "solidity-coverage": "^0.7.14",
     "ts-node": "^10.1.0",
-    "typechain": "^8.0.0",
+    "typechain": "8.0.0",
     "typescript": "^4.3.5"
   },
   "directories": {
