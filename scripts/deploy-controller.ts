@@ -1,6 +1,5 @@
 import { AbacusCore, chainConnectionConfigs, MultiProvider, objMap, serializeContracts } from '@abacus-network/sdk';
 import { ethers } from 'hardhat';
-import { controllerFactories } from '../src/config';
 import { ControllerDeployer } from '../src/deploy';
 
 
@@ -42,8 +41,7 @@ async function main() {
 
   const deployer = new ControllerDeployer(
     multiProvider,
-    config,
-    controllerFactories
+    config
   );
   const contracts = await deployer.deploy();
 

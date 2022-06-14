@@ -11,7 +11,6 @@ import { ControllerDeployer } from "./deploy";
 import {
   ControllerConfig,
   ControllerContracts,
-  controllerFactories,
 } from "./config";
 import { hardhatMultiProvider } from "@abacus-network/hardhat";
 import { ControllerApp } from "./app";
@@ -41,8 +40,7 @@ describe("controller", async () => {
     );
     deployer = new ControllerDeployer(
       multiProvider,
-      controllerConfig,
-      controllerFactories
+      controllerConfig
     );
   });
 

@@ -1,8 +1,10 @@
 import { AbacusRouterDeployer, RouterConfig } from "@abacus-network/deploy";
-import { ChainName, objMap, promiseObjAll } from "@abacus-network/sdk";
+import { DeployerOptions } from "@abacus-network/deploy/dist/src/deploy";
+import { ChainMap, ChainName, MultiProvider, objMap, promiseObjAll } from "@abacus-network/sdk";
 import {
   ControllerConfig,
   ControllerContracts,
+  controllerFactories,
   ControllerFactories,
 } from "./config";
 
@@ -10,10 +12,14 @@ export class ControllerDeployer<
   Chain extends ChainName
 > extends AbacusRouterDeployer<
   Chain,
-  ControllerConfig,
+  ControllerContracts,
   ControllerFactories,
   ControllerContracts
 > {
+  constructor(multiProvider: MultiProvider<Chain>, configMap: ChainMap<Chain, ControllerConfig & RouterConfig>, options?: DeployerOptions) {
+    super(multiProvider, configMap, controllerFactories, options)
+  }
+
   async deployContracts(
     chain: Chain,
     config: ControllerConfig & RouterConfig

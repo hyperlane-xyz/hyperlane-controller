@@ -16,7 +16,7 @@ export class ControllerApp<
 > extends AbacusApp<ControllerContracts, Chain> {
   calls: ChainMap<Chain, Call[]>
 
-  constructor(contractsMap: ChainMap<Chain, ControllerContracts>, multiProvider: MultiProvider<Chain>) {
+  constructor(contractsMap: ChainMap<Chain, ControllerContracts>, public multiProvider: MultiProvider<Chain>) {
     super(contractsMap, multiProvider)
     this.calls = objMap(contractsMap, () => [])
   }
@@ -25,7 +25,7 @@ export class ControllerApp<
     this.calls[chain].push(call);
   }
 
-  routers = () => objMap(this.contractsMap, (_, d) => d.router.contract);
+  routers = () => objMap(this.chainMap, (_, d) => d.router.contract);
 
   routerAddresses = () => objMap(this.routers(), (_, r) => r.address);
 
@@ -51,6 +51,9 @@ export class ControllerApp<
 
     const chainTransactions = await promiseObjAll(
       objMap(this.calls, (chain, calls) => {
+        if (calls.length === 0) {
+          return Promise.resolve(null)
+        }
         if (chain === controller.chain) {
           return controllerRouter.populateTransaction.call(calls);
         } else {
@@ -61,12 +64,16 @@ export class ControllerApp<
         }
       }),
     );
-    return Object.values(chainTransactions);
+    return Object.values(chainTransactions).filter(x => !!x) as ethers.PopulatedTransaction[];
   };
 
-  execute = async (signer: ethers.Signer) => {
+  execute = async () => {
     const controller = await this.controller();
-
+    const chainConnection = this.multiProvider.getChainConnection(controller.chain)
+    const signer = chainConnection.signer
+    if (!signer) {
+      throw new Error(`No signer for chain ${controller.chain}`)
+    }
     const signerAddress = await signer.getAddress();
     if (signerAddress !== controller.address) {
       throw new Error(
@@ -79,16 +86,15 @@ export class ControllerApp<
     return Promise.all(
       transactions.map(async (tx) => {
         const response = await signer.sendTransaction(tx);
-        return response.wait(5);
+        return response.wait(chainConnection.confirmations);
       }),
     );
   };
 
-  estimateGas = async (
-    provider: ethers.providers.Provider,
-  ): Promise<ethers.BigNumber[]> => {
+  estimateGas = async (): Promise<ethers.BigNumber[]> => {
     const transactions = await this.build();
     const controller = await this.controller();
+    const provider = this.multiProvider.getChainConnection(controller.chain).provider
     return Promise.all(
       transactions.map(
         (tx) => provider.estimateGas({ ...tx, from: controller.address }), // Estimate gas as the controller

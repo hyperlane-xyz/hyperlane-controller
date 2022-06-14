@@ -18,7 +18,6 @@ import { ControllerRouter, TestSet, TestSet__factory } from "./types";
 
 import { ControllerDeployer } from "./deploy";
 import { formatCall, increaseTimestampBy } from "./utils";
-import { controllerFactories } from "./config";
 
 const recoveryTimelock = 60 * 60 * 24 * 7;
 const chains: TestChainNames[] = ["test1", "test2", "test3"];
@@ -58,7 +57,7 @@ describe("ControllerRouter", async () => {
       })
     );
 
-    controllerDeploy = new ControllerDeployer(multiProvider, core.extendWithConnectionManagers(controllerConfig), controllerFactories);
+    controllerDeploy = new ControllerDeployer(multiProvider, core.extendWithConnectionManagers(controllerConfig));
   });
 
   beforeEach(async () => {

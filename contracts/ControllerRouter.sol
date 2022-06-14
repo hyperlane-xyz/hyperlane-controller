@@ -7,7 +7,7 @@ import {ControllerMessage} from "./ControllerMessage.sol";
 // ============ External Imports ============
 import {Router} from "@abacus-network/app/contracts/Router.sol";
 import {Version0} from "@abacus-network/core/contracts/Version0.sol";
-import {TypeCasts} from "@abacus-network/core/libs/TypeCasts.sol";
+import {TypeCasts} from "@abacus-network/core/contracts/libs/TypeCasts.sol";
 import {Initializable} from "@openzeppelin/contracts/proxy/Initializable.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {TypedMemView} from "@summa-tx/memview-sol/contracts/TypedMemView.sol";
