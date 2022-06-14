@@ -1,29 +1,28 @@
-import { expect } from 'chai';
-import { PopulatedTransaction } from 'ethers';
+import { expect } from "chai";
+import { PopulatedTransaction } from "ethers";
 
-import { MultisigValidatorManager__factory } from '@abacus-network/core';
-import {
-  CheckerViolation,
-  CoreConfig,
-  ProxyViolationType,
-  UpgradeBeaconViolation,
-} from '@abacus-network/deploy';
-import {
-  AbacusCore,
-  Call,
-  ChainMap,
-  ChainName,
-  ControllerApp,
-  MultiProvider,
-  objMap,
-} from '@abacus-network/sdk';
-
+import { MultisigValidatorManager__factory } from "@abacus-network/core";
 import {
   AbacusCoreChecker,
+  CheckerViolation,
+  CoreConfig,
+  UpgradeBeaconViolation,
+} from "@abacus-network/deploy";
+import {
   CoreViolationType,
   ValidatorViolation,
   ValidatorViolationType,
-} from './check';
+} from "@abacus-network/deploy/dist/src/core/check";
+import {
+  AbacusCore,
+  ChainMap,
+  ChainName,
+  MultiProvider,
+  objMap,
+} from "@abacus-network/sdk";
+import { ProxyKind } from "@abacus-network/sdk/dist/proxy";
+import { ControllerApp } from "./app";
+import { Call } from "./utils";
 
 interface CallWithTarget {
   chain: ChainName;
@@ -31,7 +30,7 @@ interface CallWithTarget {
 }
 
 export class AbacusCoreControllerChecker<
-  Chain extends ChainName,
+  Chain extends ChainName
 > extends AbacusCoreChecker<Chain> {
   readonly controllerApp: ControllerApp<Chain>;
 
@@ -39,7 +38,7 @@ export class AbacusCoreControllerChecker<
     multiProvider: MultiProvider<Chain>,
     app: AbacusCore<Chain>,
     controllerApp: ControllerApp<Chain>,
-    config: ChainMap<Chain, CoreConfig>,
+    config: ChainMap<Chain, CoreConfig>
   ) {
     const owners = controllerApp.routerAddresses();
     const joinedConfigMap = objMap(config, (chain, coreConfig) => {
@@ -55,17 +54,17 @@ export class AbacusCoreControllerChecker<
   async check(): Promise<void[]> {
     await super.check();
     const txs = await Promise.all(
-      this.violations.map((v) => this.handleViolation(v)),
+      this.violations.map((v) => this.handleViolation(v))
     );
     txs.map((call) =>
-      this.controllerApp.pushCall(call.chain as Chain, call.call),
+      this.controllerApp.pushCall(call.chain as Chain, call.call)
     );
     return [];
   }
 
   handleViolation(v: CheckerViolation): Promise<CallWithTarget> {
     switch (v.type) {
-      case ProxyViolationType.UpgradeBeacon:
+      case ProxyKind.UpgradeBeacon:
         return this.handleUpgradeBeaconViolation(v as UpgradeBeaconViolation);
       case CoreViolationType.Validator:
         return this.handleValidatorViolation(v as ValidatorViolation);
@@ -75,28 +74,28 @@ export class AbacusCoreControllerChecker<
   }
 
   async handleUpgradeBeaconViolation(
-    violation: UpgradeBeaconViolation,
+    violation: UpgradeBeaconViolation
   ): Promise<CallWithTarget> {
     const chain = violation.chain;
     const ubc = this.app.getContracts(chain as Chain).upgradeBeaconController;
-    if (ubc === undefined) throw new Error('Undefined ubc');
+    if (ubc === undefined) throw new Error("Undefined ubc");
     const tx = await ubc.populateTransaction.upgrade(
       violation.data.proxiedAddress.beacon,
-      violation.expected,
+      violation.expected
     );
-    if (tx.to === undefined) throw new Error('undefined tx.to');
+    if (tx.to === undefined) throw new Error("undefined tx.to");
     return { chain, call: tx as Call };
   }
 
   async handleValidatorViolation(
-    violation: ValidatorViolation,
+    violation: ValidatorViolation
   ): Promise<CallWithTarget> {
     const dc = this.multiProvider.getChainConnection(violation.chain as Chain);
     const provider = dc.provider!;
 
     const validatorManager = MultisigValidatorManager__factory.connect(
       violation.data.validatorManagerAddress,
-      provider,
+      provider
     );
 
     let tx: PopulatedTransaction;
@@ -105,34 +104,34 @@ export class AbacusCoreControllerChecker<
       case ValidatorViolationType.EnrollValidator:
         // Enrolling a new validator
         tx = await validatorManager.populateTransaction.enrollValidator(
-          violation.expected,
+          violation.expected
         );
         break;
       case ValidatorViolationType.UnenrollValidator:
         // Unenrolling an existing validator
         tx = await validatorManager.populateTransaction.unenrollValidator(
-          violation.actual,
+          violation.actual
         );
         break;
       case ValidatorViolationType.Threshold:
         tx = await validatorManager.populateTransaction.setThreshold(
-          violation.expected,
+          violation.expected
         );
         break;
       default:
         throw new Error(
-          `Invalid validator violation type: ${violation.data.type}`,
+          `Invalid validator violation type: ${violation.data.type}`
         );
     }
 
-    if (tx.to === undefined) throw new Error('undefined tx.to');
+    if (tx.to === undefined) throw new Error("undefined tx.to");
     return { chain: violation.chain, call: tx as Call };
   }
 
   expectCalls(chains: Chain[], count: number[]) {
     expect(chains).to.have.lengthOf(count.length);
     chains.forEach((chain, i) => {
-      expect(this.controllerApp.getCalls(chain)).to.have.lengthOf(count[i]);
+      expect(this.controllerApp.calls[chain]).to.have.lengthOf(count[i]);
     });
   }
 }

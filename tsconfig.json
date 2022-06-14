@@ -29,6 +29,8 @@
   ],
   "include": [
   "./src/",
+  "./scripts/",
+  "index.ts",
   "hardhat.config.ts"
   ]
 }
