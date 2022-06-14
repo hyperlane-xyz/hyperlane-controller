@@ -2,7 +2,7 @@
   "name": "@abacus-network/controller",
   "version": "0.2.1-alpha4",
   "dependencies": {
-    "@abacus-network/app": "^0.2.1",
+    "@abacus-network/app": "https://github.com/abacus-network/abacus-monorepo/blob/router%3C0.8/solidity/app/package.tgz?raw=true",
     "@abacus-network/core": "^0.2.1",
     "@abacus-network/deploy": "^0.2.1",
     "@abacus-network/hardhat": "^0.2.1",
@@ -42,7 +42,8 @@
   "license": "MIT OR Apache-2.0",
   "main": "dist/index.js",
   "scripts": {
-    "build": "hardhat compile && hardhat typechain && tsc",
+    "clean": "hardhat clean",
+    "build": "hardhat compile && tsc",
     "coverage": "hardhat coverage",
     "prettier": "prettier --write ./contracts ./test",
     "test": "hardhat test"
