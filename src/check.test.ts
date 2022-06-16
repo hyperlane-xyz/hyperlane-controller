@@ -6,12 +6,12 @@ import {
   AbacusCore,
   ChainMap,
   MultiProvider,
-  TestChainNames,
+  TestChainNames
 } from '@abacus-network/sdk';
 
 import {
   ControllerChain,
-  controllerConfigMap,
+  controllerConfigMap
 } from '../config/test/controller';
 
 import { ControllerApp } from './app';
@@ -19,15 +19,15 @@ import { ControllerChecker } from './check';
 import { ControllerContracts } from './config';
 import { ControllerDeployer } from './deploy';
 
-describe('controller', async () => {
+describe('Checker', async () => {
   let multiProvider: MultiProvider<TestChainNames>;
   let deployer: ControllerDeployer<TestChainNames, ControllerChain>;
   let contracts: ChainMap<TestChainNames, ControllerContracts>;
   let core: AbacusCore<TestChainNames>;
 
   before(async () => {
-    const [controllerSigner] = await ethers.getSigners();
-    multiProvider = hardhatMultiProvider(ethers.provider, controllerSigner);
+    const [deployerSigner] = await ethers.getSigners();
+    multiProvider = hardhatMultiProvider(ethers.provider, deployerSigner);
     core = AbacusCore.fromEnvironment('test', multiProvider);
     deployer = new ControllerDeployer(multiProvider, controllerConfigMap, core);
   });
@@ -37,10 +37,10 @@ describe('controller', async () => {
   });
 
   it('checks', async () => {
-    const controller = new ControllerApp(contracts, multiProvider);
+    const app = new ControllerApp(contracts, multiProvider);
     const checker = new ControllerChecker(
       multiProvider,
-      controller,
+      app,
       controllerConfigMap,
       core,
     );
