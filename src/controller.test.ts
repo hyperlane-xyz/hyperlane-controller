@@ -8,17 +8,20 @@ import { TestCoreDeploy } from "@abacus-network/hardhat/dist/src/TestCoreDeploy"
 import {
   chainMetadata,
   MultiProvider,
-  objMap,
-  TestChainNames,
+  TestChainNames
 } from "@abacus-network/sdk";
 import { utils } from "@abacus-network/utils";
 
+import {
+  ControllerChain,
+  controllerConfigMap
+} from "../config/test/controller";
 import { ControllerRouter, TestSet, TestSet__factory } from "./types";
 
 import { ControllerDeployer } from "./deploy";
 import { formatCall, increaseTimestampBy } from "./utils";
 
-const recoveryTimelock = 60 * 60 * 24 * 7;
+const recoveryTimelock = controllerConfigMap.test1.recoveryTimelock;
 const chains: TestChainNames[] = ["test1", "test2", "test3"];
 const [localChain, remoteChain] = chains;
 const domains = chains.map((chain) => chainMetadata[chain].id);
@@ -32,7 +35,7 @@ describe("ControllerRouter", async () => {
     router: ControllerRouter,
     remote: ControllerRouter,
     testSet: TestSet,
-    controllerDeploy: ControllerDeployer<TestChainNames>,
+    controllerDeploy: ControllerDeployer<TestChainNames, ControllerChain>,
     // interchainGasPaymaster: InterchainGasPaymaster,
     multiProvider: MultiProvider<TestChainNames>,
     core: TestCoreApp;
@@ -48,18 +51,10 @@ describe("ControllerRouter", async () => {
     const testSetFactory = new TestSet__factory(controller);
     testSet = await testSetFactory.deploy();
 
-    const controllerConfig = objMap(core.contractsMap, (chain) => ({
-      recoveryTimelock,
-      recoveryManager: recoveryManager.address,
-      owner:
-        chain === localChain
-          ? controller.address
-          : ethers.constants.AddressZero,
-    }));
-
     controllerDeploy = new ControllerDeployer(
       multiProvider,
-      core.extendWithConnectionManagers(controllerConfig)
+      controllerConfigMap,
+      core
     );
   });
 

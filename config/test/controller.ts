@@ -1,21 +1,24 @@
-import { ChainMap } from '@abacus-network/sdk';
+import { TestChainNames } from "@abacus-network/sdk";
+import { ethers } from "ethers";
 
-import { ControllerConfig } from '../../../src/controller';
+import { ControllerConfig, ControllerConfigMap } from "../../src/config";
 
-import { TestChains } from './chains';
+export type ControllerChain = "test1";
 
 const defaultControllerConfig: ControllerConfig = {
-  recoveryManager: '0x4FbBB2b0820CF0cF027BbB58DC7F7f760BC0c57e',
-  recoveryTimelock: 180,
+  recoveryManager: "0x4FbBB2b0820CF0cF027BbB58DC7F7f760BC0c57e",
+  recoveryTimelock: 60 * 60 * 24 * 7,
+  controller: ethers.constants.AddressZero,
 };
 
-const addresses = {
+export const controllerConfigMap: ControllerConfigMap<
+  TestChainNames,
+  ControllerChain
+> = {
   test1: {
     ...defaultControllerConfig,
-    controller: '0x4FbBB2b0820CF0cF027BbB58DC7F7f760BC0c57e',
+    controller: "0x4FbBB2b0820CF0cF027BbB58DC7F7f760BC0c57e",
   },
   test2: defaultControllerConfig,
   test3: defaultControllerConfig,
 };
-
-export const controller: ChainMap<TestChains, ControllerConfig> = addresses;

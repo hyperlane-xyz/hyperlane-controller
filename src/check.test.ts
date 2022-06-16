@@ -1,47 +1,29 @@
-import "@nomiclabs/hardhat-waffle";
-import { ethers } from "hardhat";
+import { hardhatMultiProvider } from "@abacus-network/hardhat";
 import {
   AbacusCore,
   ChainMap,
-  MultiProvider,
-  objMap,
-  TestChainNames,
+  MultiProvider, TestChainNames
 } from "@abacus-network/sdk";
-import { ControllerDeployer } from "./deploy";
-import {
-  ControllerConfig,
-  ControllerContracts,
-} from "./config";
-import { hardhatMultiProvider } from "@abacus-network/hardhat";
+import "@nomiclabs/hardhat-waffle";
+import { ethers } from "hardhat";
+import { ControllerChain, controllerConfigMap } from "../config/test/controller";
 import { ControllerApp } from "./app";
 import { ControllerChecker } from "./check";
+import { ControllerContracts } from "./config";
+import { ControllerDeployer } from "./deploy";
 
 describe("controller", async () => {
+
   let multiProvider: MultiProvider<TestChainNames>;
-  let deployer: ControllerDeployer<TestChainNames>;
-  let controllerConfig: ChainMap<
-    TestChainNames,
-    ControllerConfig & { abacusConnectionManager: string }
-  >;
+  let deployer: ControllerDeployer<TestChainNames, ControllerChain>;
   let contracts: ChainMap<TestChainNames, ControllerContracts>;
+  let core: AbacusCore<TestChainNames>;
 
   before(async () => {
-    const recoveryTimelock = 60 * 60 * 24 * 7;
-    const [controller, recoveryManager] = await ethers.getSigners();
-    multiProvider = hardhatMultiProvider(ethers.provider, controller);
-    const core = AbacusCore.fromEnvironment("test", multiProvider);
-    controllerConfig = core.extendWithConnectionManagers(
-      objMap(core.contractsMap, (chain) => ({
-        recoveryTimelock,
-        recoveryManager: recoveryManager.address,
-        owner:
-          chain === "test1" ? controller.address : ethers.constants.AddressZero,
-      }))
-    );
-    deployer = new ControllerDeployer(
-      multiProvider,
-      controllerConfig
-    );
+    const [controllerSigner] = await ethers.getSigners();
+    multiProvider = hardhatMultiProvider(ethers.provider, controllerSigner);
+    core = AbacusCore.fromEnvironment("test", multiProvider);
+    deployer = new ControllerDeployer(multiProvider, controllerConfigMap, core);
   });
 
   it("deploys", async () => {
@@ -53,7 +35,8 @@ describe("controller", async () => {
     const checker = new ControllerChecker(
       multiProvider,
       controller,
-      controllerConfig
+      controllerConfigMap,
+      core
     );
     await checker.check();
   });

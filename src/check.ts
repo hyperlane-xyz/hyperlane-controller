@@ -1,18 +1,33 @@
 import { expect } from "chai";
 
 import { AbacusRouterChecker, RouterConfig } from "@abacus-network/deploy";
-import { ChainName } from "@abacus-network/sdk";
+import { AbacusCore, ChainName, MultiProvider } from "@abacus-network/sdk";
 import { ControllerApp } from "./app";
-import { ControllerConfig, ControllerContracts } from "./config";
+import {
+  ControllerConfig,
+  ControllerConfigMap,
+  ControllerContracts,
+} from "./config";
+import { buildRouterConfigMap } from "./utils";
 
 export class ControllerChecker<
-  Chain extends ChainName
+  Chain extends ChainName,
+  ControllerChain extends Chain
 > extends AbacusRouterChecker<
   Chain,
   ControllerContracts,
   ControllerApp<Chain>,
-  ControllerConfig & RouterConfig
+  ControllerConfig<any> & RouterConfig
 > {
+  constructor(
+    multiProvider: MultiProvider<Chain>,
+    app: ControllerApp<Chain>,
+    configMap: ControllerConfigMap<Chain, ControllerChain>,
+    core: AbacusCore<Chain>
+  ) {
+    super(multiProvider, app, buildRouterConfigMap(configMap, core));
+  }
+
   // ControllerRouter's owner is 0x0 on all chains except the controlling chain as setup in the constructor
   async checkOwnership(chain: Chain): Promise<void> {
     const contracts = this.app.getContracts(chain);

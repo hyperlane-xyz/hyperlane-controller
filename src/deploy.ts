@@ -1,6 +1,7 @@
 import { AbacusRouterDeployer, RouterConfig } from "@abacus-network/deploy";
 import { DeployerOptions } from "@abacus-network/deploy/dist/src/deploy";
 import {
+  AbacusCore,
   ChainMap,
   ChainName,
   MultiProvider,
@@ -9,25 +10,34 @@ import {
 } from "@abacus-network/sdk";
 import {
   ControllerConfig,
+  ControllerConfigMap,
   ControllerContracts,
   controllerFactories,
   ControllerFactories,
 } from "./config";
+import { buildRouterConfigMap } from "./utils";
 
 export class ControllerDeployer<
-  Chain extends ChainName
+  Chain extends ChainName,
+  ControllerChain extends Chain
 > extends AbacusRouterDeployer<
   Chain,
   ControllerContracts,
   ControllerFactories,
-  ControllerConfig
+  ControllerConfig<any>
 > {
   constructor(
     multiProvider: MultiProvider<Chain>,
-    configMap: ChainMap<Chain, ControllerConfig & RouterConfig>,
+    configMap: ControllerConfigMap<Chain, ControllerChain>,
+    core: AbacusCore<Chain>,
     options?: DeployerOptions
   ) {
-    super(multiProvider, configMap, controllerFactories, options);
+    super(
+      multiProvider,
+      buildRouterConfigMap(configMap, core),
+      controllerFactories,
+      options
+    );
   }
 
   async deployContracts(
@@ -61,17 +71,18 @@ export class ControllerDeployer<
     };
   }
 
+  async setControllers(contractsMap: ChainMap<Chain, ControllerContracts>) {
+    return promiseObjAll(
+      objMap(contractsMap, async (local, contracts) =>
+        contracts.router.setController(this.configMap[local].controller)
+      )
+    );
+  }
+
   async deploy() {
     const contractsMap = await super.deploy();
 
-    // Transfer ownership of routers to controller and recovery manager.
-    await promiseObjAll(
-      objMap(contractsMap, async (local, contracts) => {
-        const config = this.configMap[local];
-        await contracts.router.transferOwnership(config.recoveryManager);
-        await contracts.router.setController(config.owner);
-      })
-    );
+    await this.setControllers(contractsMap);
 
     return contractsMap;
   }

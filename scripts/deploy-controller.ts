@@ -33,7 +33,7 @@ async function main() {
     objMap(core.contractsMap, (chain) => ({
       recoveryTimelock,
       recoveryManager: signer.address,
-      owner:
+      controller:
         chain === "alfajores" ? signer.address : ethers.constants.AddressZero,
     }))
   );
@@ -41,7 +41,8 @@ async function main() {
 
   const deployer = new ControllerDeployer(
     multiProvider,
-    config
+    config,
+    core
   );
   const contracts = await deployer.deploy();
 
