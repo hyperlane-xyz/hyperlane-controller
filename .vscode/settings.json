@@ -1,0 +1,20 @@
+{
+      "editor.tabSize": 2,
+      "editor.formatOnSave": true,
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+      "prettier.configPath": "../.prettierrc",
+      "workbench.editor.labelFormat": "medium",
+      "npm.autoDetect": "on",
+      "npm.packageManager": "yarn",
+      "npm.enableRunFromFolder": true,
+      "npm.scriptExplorerAction": "run",
+      "npm.fetchOnlinePackageInfo": true,
+      "scm.diffDecorationsGutterPattern": {
+        "added": true
+      },
+      "files.watcherExclude": {
+        "**/.git/**": true,
+        "**/node_modules/*/**": true
+      }
+  }
+  

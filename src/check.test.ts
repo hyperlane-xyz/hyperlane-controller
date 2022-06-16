@@ -1,59 +1,48 @@
-import "@nomiclabs/hardhat-waffle";
-import { ethers } from "hardhat";
+import '@nomiclabs/hardhat-waffle';
+import { ethers } from 'hardhat';
+
+import { hardhatMultiProvider } from '@abacus-network/hardhat';
 import {
   AbacusCore,
   ChainMap,
   MultiProvider,
-  objMap,
-  TestChainNames,
-} from "@abacus-network/sdk";
-import { ControllerDeployer } from "./deploy";
-import {
-  ControllerConfig,
-  ControllerContracts,
-} from "./config";
-import { hardhatMultiProvider } from "@abacus-network/hardhat";
-import { ControllerApp } from "./app";
-import { ControllerChecker } from "./check";
+  TestChainNames
+} from '@abacus-network/sdk';
 
-describe("controller", async () => {
+import {
+  ControllerChain,
+  controllerConfigMap
+} from '../config/test/controller';
+
+import { ControllerApp } from './app';
+import { ControllerChecker } from './check';
+import { ControllerContracts } from './config';
+import { ControllerDeployer } from './deploy';
+
+describe('Checker', async () => {
   let multiProvider: MultiProvider<TestChainNames>;
-  let deployer: ControllerDeployer<TestChainNames>;
-  let controllerConfig: ChainMap<
-    TestChainNames,
-    ControllerConfig & { abacusConnectionManager: string }
-  >;
+  let deployer: ControllerDeployer<TestChainNames, ControllerChain>;
   let contracts: ChainMap<TestChainNames, ControllerContracts>;
+  let core: AbacusCore<TestChainNames>;
 
   before(async () => {
-    const recoveryTimelock = 60 * 60 * 24 * 7;
-    const [controller, recoveryManager] = await ethers.getSigners();
-    multiProvider = hardhatMultiProvider(ethers.provider, controller);
-    const core = AbacusCore.fromEnvironment("test", multiProvider);
-    controllerConfig = core.extendWithConnectionManagers(
-      objMap(core.contractsMap, (chain) => ({
-        recoveryTimelock,
-        recoveryManager: recoveryManager.address,
-        owner:
-          chain === "test1" ? controller.address : ethers.constants.AddressZero,
-      }))
-    );
-    deployer = new ControllerDeployer(
-      multiProvider,
-      controllerConfig
-    );
+    const [deployerSigner] = await ethers.getSigners();
+    multiProvider = hardhatMultiProvider(ethers.provider, deployerSigner);
+    core = AbacusCore.fromEnvironment('test', multiProvider);
+    deployer = new ControllerDeployer(multiProvider, controllerConfigMap, core);
   });
 
-  it("deploys", async () => {
+  it('deploys', async () => {
     contracts = await deployer.deploy();
   });
 
-  it("checks", async () => {
-    const controller = new ControllerApp(contracts, multiProvider);
+  it('checks', async () => {
+    const app = new ControllerApp(contracts, multiProvider);
     const checker = new ControllerChecker(
       multiProvider,
-      controller,
-      controllerConfig
+      app,
+      controllerConfigMap,
+      core,
     );
     await checker.check();
   });

@@ -1,22 +1,33 @@
+import { ethers } from 'ethers';
+
 import {
   UpgradeBeaconController,
-  UpgradeBeaconController__factory,
-} from "@abacus-network/core";
+  UpgradeBeaconController__factory
+} from '@abacus-network/core';
 import {
-  ChainMap,
-  Chains,
+  ChainName,
   RouterContracts,
-  RouterFactories,
-} from "@abacus-network/sdk";
-import { types } from "@abacus-network/utils";
-import { ethers } from "hardhat";
-import { ControllerRouter, ControllerRouter__factory } from "./types";
+  RouterFactories
+} from '@abacus-network/sdk';
+import { types } from '@abacus-network/utils';
 
-export type ControllerConfig = {
+import { ControllerRouter, ControllerRouter__factory } from '../types';
+
+export type ControllerConfig<IsGovernor extends boolean = false> = {
   recoveryManager: types.Address;
-  // Should be 0x0 on all non-controlling chains
-  owner: types.Address;
   recoveryTimelock: number;
+  controller: IsGovernor extends true
+    ? types.Address
+    : typeof ethers.constants.AddressZero;
+};
+
+export type ControllerConfigMap<
+  Chain extends ChainName,
+  ControllerChain extends Chain,
+> = {
+  [key in Chain]: key extends ControllerChain
+    ? ControllerConfig<true>
+    : ControllerConfig;
 };
 
 export type ControllerFactories = RouterFactories<ControllerRouter> & {
@@ -32,25 +43,28 @@ export type ControllerContracts = RouterContracts<ControllerRouter> & {
   upgradeBeaconController: UpgradeBeaconController;
 };
 
-export function validateControllerConfig<Chain extends Chains = Chains>(
-  configs: ChainMap<Chain, ControllerConfig>
-) {
-  const controllingEntry = Object.entries<ControllerConfig>(configs).find(
-    ([_, config]) => config.owner !== ethers.constants.AddressZero
+export function validateControllerConfig<
+  Chain extends ChainName = ChainName,
+  ControllerChain extends Chain = Chain,
+>(configs: ControllerConfigMap<Chain, ControllerChain>) {
+  const controllingEntry = Object.entries<ControllerConfig<any>>(configs).find(
+    ([_, config]) => config.controller !== ethers.constants.AddressZero,
   );
 
   if (!controllingEntry) {
-    throw new Error("Config does not contain any controller");
+    throw new Error('Config does not contain any controller');
   }
 
   const controllingChain = controllingEntry[0];
 
-  for (const [chain, config] of Object.entries<ControllerConfig>(configs)) {
+  for (const [chain, config] of Object.entries<ControllerConfig<any>>(
+    configs,
+  )) {
     if (chain === controllingChain) continue;
 
-    if (config.owner !== ethers.constants.AddressZero) {
+    if (config.controller !== ethers.constants.AddressZero) {
       throw new Error(
-        `Config contains controller ${config.owner} for chain ${chain}, but chain ${controllingChain} does as well`
+        `Config contains controller ${config.controller} for chain ${chain}, but chain ${controllingChain} does as well`,
       );
     }
   }

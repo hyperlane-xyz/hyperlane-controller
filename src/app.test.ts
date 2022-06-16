@@ -1,53 +1,43 @@
-import "@nomiclabs/hardhat-waffle";
-import { ethers } from "hardhat";
-import {
-  ChainMap,
-  MultiProvider,
-  objMap,
-  TestChainNames,
-} from "@abacus-network/sdk";
-import { ControllerDeployer } from "./deploy";
-import { ControllerConfig, ControllerContracts } from "./config";
-import { hardhatMultiProvider } from "@abacus-network/hardhat";
-import { ControllerApp } from "./app";
-import { TestCoreDeploy } from "@abacus-network/hardhat/dist/src/TestCoreDeploy";
-import { TestRecipient__factory } from "@abacus-network/core";
-import { Signer } from "ethers";
-import { addressToBytes32 } from "@abacus-network/utils/dist/src/utils";
-import { expect } from "chai";
-import { TestCoreApp } from "@abacus-network/hardhat/dist/src/TestCoreApp";
+import '@nomiclabs/hardhat-waffle';
+import { expect } from 'chai';
+import { ethers } from 'hardhat';
 
-describe("ControllerApp", async () => {
+import { TestRecipient__factory } from '@abacus-network/core';
+import { hardhatMultiProvider } from '@abacus-network/hardhat';
+import { TestCoreApp } from '@abacus-network/hardhat/dist/src/TestCoreApp';
+import { TestCoreDeploy } from '@abacus-network/hardhat/dist/src/TestCoreDeploy';
+import { ChainMap, MultiProvider, TestChainNames } from '@abacus-network/sdk';
+import { addressToBytes32 } from '@abacus-network/utils/dist/src/utils';
+
+import {
+  controllerChain,
+  ControllerChain,
+  controllerConfigMap
+} from '../config/test/controller';
+
+import { Signer } from 'ethers';
+import { ControllerApp } from './app';
+import { ControllerContracts } from './config';
+import { ControllerDeployer } from './deploy';
+
+describe('App', async () => {
   let multiProvider: MultiProvider<TestChainNames>;
-  let deployer: ControllerDeployer<TestChainNames>;
-  let controllerConfig: ChainMap<
-    TestChainNames,
-    ControllerConfig & { abacusConnectionManager: string }
-  >;
+  let core: TestCoreApp;
+  let deployer: ControllerDeployer<TestChainNames, ControllerChain>;
   let contracts: ChainMap<TestChainNames, ControllerContracts>;
   let controllerSigner: Signer;
-  let core: TestCoreApp
+  let deployerSigner: Signer;
 
   before(async () => {
-    const recoveryTimelock = 60 * 60 * 24 * 7;
-    const [controller, recoveryManager] = await ethers.getSigners();
-    controllerSigner = controller;
-    multiProvider = hardhatMultiProvider(ethers.provider, controller);
+    [deployerSigner, controllerSigner] = await ethers.getSigners();
+    multiProvider = hardhatMultiProvider(ethers.provider, deployerSigner);
     const coreDeployer = new TestCoreDeploy(multiProvider);
     core = await coreDeployer.deployCore();
-    controllerConfig = core.extendWithConnectionManagers(
-      objMap(core.contractsMap, (chain) => ({
-        recoveryTimelock,
-        recoveryManager: recoveryManager.address,
-        owner:
-          chain === "test1" ? controller.address : ethers.constants.AddressZero,
-      }))
-    );
-    deployer = new ControllerDeployer(multiProvider, controllerConfig);
+    deployer = new ControllerDeployer(multiProvider, controllerConfigMap, core);
     contracts = await deployer.deploy();
   });
 
-  describe("calls", () => {
+  describe('calls', () => {
     let app: ControllerApp<TestChainNames>;
     beforeEach(async () => {
       app = new ControllerApp(contracts, multiProvider);
@@ -55,25 +45,30 @@ describe("ControllerApp", async () => {
       const recipientF = new TestRecipient__factory(controllerSigner);
       const recipient = await recipientF.deploy();
 
-      const functionCall = await recipient.populateTransaction.handle(0, addressToBytes32(recipient.address), "0x")
-      app.pushCall("test2", {
+      const functionCall = await recipient.populateTransaction.handle(
+        0,
+        addressToBytes32(recipient.address),
+        '0x',
+      );
+      app.pushCall('test2', {
         to: addressToBytes32(recipient.address),
         data: functionCall.data!,
       });
     });
 
-    it("can build calls", async () => {
+    it('can build calls', async () => {
       const calls = await app.build();
       expect(calls).to.have.lengthOf(1);
     });
 
-    it("can estimateGas", async () => {
+    it('can estimateGas', async () => {
       await app.estimateGas();
     });
 
-    it("can execute", async () => {
-      await app.execute();
-      await core.processMessages()
+    it('can execute', async () => {
+      app.connectToChain(controllerChain, controllerSigner);
+      await app.execute(controllerSigner);
+      await core.processMessages();
     });
   });
 });

@@ -1,7 +1,15 @@
 import { ethers } from 'ethers';
 
+import { RouterConfig } from '@abacus-network/deploy';
+import {
+  AbacusCore,
+  ChainName,
+  objMap,
+  utils as sdkUtils,
+} from '@abacus-network/sdk';
 import { types, utils } from '@abacus-network/utils';
-import { utils as sdkUtils } from '@abacus-network/sdk';
+
+import { ControllerConfig, ControllerConfigMap } from './config';
 
 export enum ControllerMessage {
   CALL = 1,
@@ -98,7 +106,6 @@ export const increaseTimestampBy = async (
   await provider.send('evm_mine', []);
 };
 
-
 export interface Call {
   to: types.Address;
   data: ethers.utils.BytesLike;
@@ -136,4 +143,19 @@ export function normalizeCall(partial: Partial<Call>): Readonly<Call> {
     to,
     data,
   });
+}
+
+export function buildRouterConfigMap<Chain extends ChainName>(
+  controllerConfigMap: ControllerConfigMap<Chain, any>,
+  core: AbacusCore<Chain>,
+) {
+  return objMap(
+    controllerConfigMap,
+    (chain, controllerConfig): RouterConfig & ControllerConfig<any> => ({
+      ...controllerConfig,
+      owner: controllerConfig.recoveryManager,
+      abacusConnectionManager:
+        core.getContracts(chain).abacusConnectionManager.address,
+    }),
+  );
 }

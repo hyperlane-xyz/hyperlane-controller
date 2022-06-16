@@ -1,4 +1,4 @@
-import { ethers } from "ethers";
+import { ethers, Signer } from "ethers";
 import { ControllerContracts } from "./config";
 
 import { types } from "@abacus-network/utils";
@@ -10,7 +10,7 @@ import {
   ChainNameToDomainId,
   MultiProvider,
   objMap,
-  promiseObjAll,
+  promiseObjAll
 } from "@abacus-network/sdk";
 import { Call } from "./utils";
 
@@ -20,7 +20,7 @@ export type Controller = {
 };
 
 export class ControllerApp<
-  Chain extends ChainName = ChainName
+  Chain extends ChainName = ChainName,
 > extends AbacusApp<ControllerContracts, Chain> {
   calls: ChainMap<Chain, Call[]>;
 
@@ -80,12 +80,12 @@ export class ControllerApp<
     ) as ethers.PopulatedTransaction[];
   };
 
-  execute = async () => {
+  execute = async (_signer?: Signer) => {
     const controller = await this.controller();
     const chainConnection = this.multiProvider.getChainConnection(
       controller.chain
     );
-    const signer = chainConnection.signer;
+    const signer = _signer ?? chainConnection.signer;
     if (!signer) {
       throw new Error(`No signer for chain ${controller.chain}`);
     }
