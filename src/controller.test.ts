@@ -1,35 +1,34 @@
-import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import { expect } from "chai";
-import { ethers } from "hardhat";
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { expect } from 'chai';
+import { ethers } from 'hardhat';
 
-import { hardhatMultiProvider } from "@abacus-network/hardhat";
-import { TestCoreApp } from "@abacus-network/hardhat/dist/src/TestCoreApp";
-import { TestCoreDeploy } from "@abacus-network/hardhat/dist/src/TestCoreDeploy";
+import { hardhatMultiProvider } from '@abacus-network/hardhat';
+import { TestCoreApp } from '@abacus-network/hardhat/dist/src/TestCoreApp';
+import { TestCoreDeploy } from '@abacus-network/hardhat/dist/src/TestCoreDeploy';
 import {
-  chainMetadata,
-  MultiProvider,
+  chainMetadata, MultiProvider,
   TestChainNames
-} from "@abacus-network/sdk";
-import { utils } from "@abacus-network/utils";
+} from '@abacus-network/sdk';
+import { utils } from '@abacus-network/utils';
 
 import {
   ControllerChain,
   controllerConfigMap
-} from "../config/test/controller";
-import { ControllerRouter, TestSet, TestSet__factory } from "./types";
+} from '../config/test/controller';
 
-import { ControllerDeployer } from "./deploy";
-import { formatCall, increaseTimestampBy } from "./utils";
+import { ControllerRouter, TestSet, TestSet__factory } from '../types';
+import { ControllerDeployer } from './deploy';
+import { formatCall, increaseTimestampBy } from './utils';
 
 const recoveryTimelock = controllerConfigMap.test1.recoveryTimelock;
-const chains: TestChainNames[] = ["test1", "test2", "test3"];
+const chains: TestChainNames[] = ['test1', 'test2', 'test3'];
 const [localChain, remoteChain] = chains;
 const domains = chains.map((chain) => chainMetadata[chain].id);
 const [, remoteDomain] = domains;
 const testDomain = remoteDomain * 2;
-const ONLY_OWNER_REVERT_MESSAGE = "Ownable: caller is not the owner";
+const ONLY_OWNER_REVERT_MESSAGE = 'Ownable: caller is not the owner';
 
-describe("ControllerRouter", async () => {
+describe('ControllerRouter', async () => {
   let controller: SignerWithAddress,
     recoveryManager: SignerWithAddress,
     router: ControllerRouter,
@@ -54,7 +53,7 @@ describe("ControllerRouter", async () => {
     controllerDeploy = new ControllerDeployer(
       multiProvider,
       controllerConfigMap,
-      core
+      core,
     );
   });
 
@@ -66,59 +65,59 @@ describe("ControllerRouter", async () => {
     //   core.getContracts(localChain).interchainGasPaymaster;
   });
 
-  it("Cannot be initialized twice", async () => {
+  it('Cannot be initialized twice', async () => {
     await expect(
-      router.initialize(ethers.constants.AddressZero)
-    ).to.be.revertedWith("Initializable: contract is already initialized");
+      router.initialize(ethers.constants.AddressZero),
+    ).to.be.revertedWith('Initializable: contract is already initialized');
   });
 
-  describe("when not in recovery mode", async () => {
-    it("controller is the owner", async () => {
+  describe('when not in recovery mode', async () => {
+    it('controller is the owner', async () => {
       expect(await router.owner()).to.equal(controller.address);
     });
 
-    it("controller can set local recovery manager", async () => {
+    it('controller can set local recovery manager', async () => {
       expect(await router.recoveryManager()).to.equal(recoveryManager.address);
       await router.transferOwnership(router.address);
       expect(await router.recoveryManager()).to.equal(router.address);
       expect(await router.recoveryActiveAt()).to.equal(0);
     });
 
-    it("controller can make local calls", async () => {
+    it('controller can make local calls', async () => {
       const value = 12;
-      const call = formatCall(testSet, "set", [value]);
+      const call = formatCall(testSet, 'set', [value]);
       await router.call([call]);
       expect(await testSet.get()).to.equal(value);
     });
 
-    it("controller can set local controller", async () => {
+    it('controller can set local controller', async () => {
       expect(await router.controller()).to.equal(controller.address);
       await router.setController(ethers.constants.AddressZero);
       expect(await router.controller()).to.equal(ethers.constants.AddressZero);
     });
 
-    it("controller can set local abacusConnectionManager", async () => {
+    it('controller can set local abacusConnectionManager', async () => {
       expect(await router.abacusConnectionManager()).to.equal(
-        core.getContracts(localChain).abacusConnectionManager.address
+        core.getContracts(localChain).abacusConnectionManager.address,
       );
       await router.setAbacusConnectionManager(ethers.constants.AddressZero);
       expect(await router.abacusConnectionManager()).to.equal(
-        ethers.constants.AddressZero
+        ethers.constants.AddressZero,
       );
     });
 
-    it("controller can enroll local remote router", async () => {
+    it('controller can enroll local remote router', async () => {
       expect(await router.routers(testDomain)).to.equal(
-        ethers.constants.HashZero
+        ethers.constants.HashZero,
       );
       const newRouter = utils.addressToBytes32(router.address);
       await router.enrollRemoteRouter(testDomain, newRouter);
       expect(await router.routers(testDomain)).to.equal(newRouter);
     });
 
-    it("controller can make remote calls", async () => {
+    it('controller can make remote calls', async () => {
       const value = 13;
-      const call = formatCall(testSet, "set", [value]);
+      const call = formatCall(testSet, 'set', [value]);
       await router.callRemote(remoteDomain, [call]);
       await core.processMessages();
       expect(await testSet.get()).to.equal(value);
@@ -137,7 +136,7 @@ describe("ControllerRouter", async () => {
     //     .withArgs(leafIndex, testInterchainGasPayment);
     // });
 
-    it("controller can set remote controller", async () => {
+    it('controller can set remote controller', async () => {
       const newController = controller.address;
       expect(await remote.controller()).to.not.equal(newController);
       await router.setControllerRemote(remoteDomain, newController);
@@ -157,18 +156,18 @@ describe("ControllerRouter", async () => {
     //     .withArgs(leafIndex, testInterchainGasPayment);
     // });
 
-    it("controller can set remote abacusConnectionManager", async () => {
+    it('controller can set remote abacusConnectionManager', async () => {
       const newConnectionManager = ethers.constants.AddressZero;
       expect(await remote.abacusConnectionManager()).to.not.equal(
-        newConnectionManager
+        newConnectionManager,
       );
       await router.setAbacusConnectionManagerRemote(
         remoteDomain,
-        newConnectionManager
+        newConnectionManager,
       );
       await core.processMessages();
       expect(await remote.abacusConnectionManager()).to.equal(
-        newConnectionManager
+        newConnectionManager,
       );
     });
 
@@ -185,15 +184,15 @@ describe("ControllerRouter", async () => {
     //     .withArgs(leafIndex, testInterchainGasPayment);
     // });
 
-    it("controller can enroll remote remote router", async () => {
+    it('controller can enroll remote remote router', async () => {
       expect(await remote.routers(testDomain)).to.equal(
-        ethers.constants.HashZero
+        ethers.constants.HashZero,
       );
       const newRouter = utils.addressToBytes32(router.address);
       await router.enrollRemoteRouterRemote(
         remoteDomain,
         testDomain,
-        newRouter
+        newRouter,
       );
       await core.processMessages();
       expect(await remote.routers(testDomain)).to.equal(newRouter);
@@ -211,108 +210,108 @@ describe("ControllerRouter", async () => {
     //     .withArgs(leafIndex, testInterchainGasPayment);
     // });
 
-    it("controller cannot initiate recovery", async () => {
+    it('controller cannot initiate recovery', async () => {
       await expect(router.initiateRecoveryTimelock()).to.be.revertedWith(
-        "!recoveryManager"
+        '!recoveryManager',
       );
     });
 
-    it("controller cannot exit recovery", async () => {
-      await expect(router.exitRecovery()).to.be.revertedWith("!recovery");
+    it('controller cannot exit recovery', async () => {
+      await expect(router.exitRecovery()).to.be.revertedWith('!recovery');
     });
 
-    it("recoveryManager can set local recovery manager", async () => {
+    it('recoveryManager can set local recovery manager', async () => {
       expect(await router.recoveryManager()).to.equal(recoveryManager.address);
       await router.connect(recoveryManager).transferOwnership(router.address);
       expect(await router.recoveryManager()).to.equal(router.address);
       expect(await router.recoveryActiveAt()).to.equal(0);
     });
 
-    it("recovery manager cannot make local calls", async () => {
+    it('recovery manager cannot make local calls', async () => {
       const value = 12;
-      const call = formatCall(testSet, "set", [value]);
+      const call = formatCall(testSet, 'set', [value]);
       await expect(
-        router.connect(recoveryManager).call([call])
+        router.connect(recoveryManager).call([call]),
       ).to.be.revertedWith(ONLY_OWNER_REVERT_MESSAGE);
     });
 
-    it("recovery manager cannot set local controller", async () => {
-      await expect(
-        router
-          .connect(recoveryManager)
-          .setController(ethers.constants.AddressZero)
-      ).to.be.revertedWith(ONLY_OWNER_REVERT_MESSAGE);
-    });
-
-    it("recovery manager cannot set local abacusConnectionManager", async () => {
+    it('recovery manager cannot set local controller', async () => {
       await expect(
         router
           .connect(recoveryManager)
-          .setAbacusConnectionManager(router.address)
+          .setController(ethers.constants.AddressZero),
       ).to.be.revertedWith(ONLY_OWNER_REVERT_MESSAGE);
     });
 
-    it("recovery manager cannot enroll local remote router", async () => {
+    it('recovery manager cannot set local abacusConnectionManager', async () => {
+      await expect(
+        router
+          .connect(recoveryManager)
+          .setAbacusConnectionManager(router.address),
+      ).to.be.revertedWith(ONLY_OWNER_REVERT_MESSAGE);
+    });
+
+    it('recovery manager cannot enroll local remote router', async () => {
       await expect(
         router
           .connect(recoveryManager)
           .enrollRemoteRouter(
             testDomain,
-            utils.addressToBytes32(router.address)
-          )
+            utils.addressToBytes32(router.address),
+          ),
       ).to.be.revertedWith(ONLY_OWNER_REVERT_MESSAGE);
     });
 
-    it("recovery manager cannot make remote calls", async () => {
+    it('recovery manager cannot make remote calls', async () => {
       const value = 13;
-      const call = formatCall(testSet, "set", [value]);
+      const call = formatCall(testSet, 'set', [value]);
       await expect(
-        router.connect(recoveryManager).callRemote(remoteDomain, [call])
-      ).to.be.revertedWith("!controller");
+        router.connect(recoveryManager).callRemote(remoteDomain, [call]),
+      ).to.be.revertedWith('!controller');
     });
 
-    it("recovery manager cannot set remote controller", async () => {
-      await expect(
-        router
-          .connect(recoveryManager)
-          .setControllerRemote(remoteDomain, router.address)
-      ).to.be.revertedWith("!controller");
-    });
-
-    it("recovery manager cannot set remote abacusConnectionManager", async () => {
+    it('recovery manager cannot set remote controller', async () => {
       await expect(
         router
           .connect(recoveryManager)
-          .setAbacusConnectionManagerRemote(remoteDomain, router.address)
-      ).to.be.revertedWith("!controller");
+          .setControllerRemote(remoteDomain, router.address),
+      ).to.be.revertedWith('!controller');
     });
 
-    it("recovery manager cannot enroll remote remote router", async () => {
+    it('recovery manager cannot set remote abacusConnectionManager', async () => {
+      await expect(
+        router
+          .connect(recoveryManager)
+          .setAbacusConnectionManagerRemote(remoteDomain, router.address),
+      ).to.be.revertedWith('!controller');
+    });
+
+    it('recovery manager cannot enroll remote remote router', async () => {
       await expect(
         router
           .connect(recoveryManager)
           .enrollRemoteRouterRemote(
             testDomain,
             testDomain,
-            utils.addressToBytes32(router.address)
-          )
-      ).to.be.revertedWith("!controller");
+            utils.addressToBytes32(router.address),
+          ),
+      ).to.be.revertedWith('!controller');
     });
 
-    it("recovery manager can initiate recovery", async () => {
+    it('recovery manager can initiate recovery', async () => {
       await expect(
-        router.connect(recoveryManager).initiateRecoveryTimelock()
-      ).to.emit(router, "InitiateRecovery");
+        router.connect(recoveryManager).initiateRecoveryTimelock(),
+      ).to.emit(router, 'InitiateRecovery');
     });
 
-    it("recovery manager cannot exit recovery", async () => {
+    it('recovery manager cannot exit recovery', async () => {
       await expect(
-        router.connect(recoveryManager).exitRecovery()
-      ).to.be.revertedWith("!recovery");
+        router.connect(recoveryManager).exitRecovery(),
+      ).to.be.revertedWith('!recovery');
     });
   });
 
-  describe("when in recovery mode", async () => {
+  describe('when in recovery mode', async () => {
     beforeEach(async () => {
       router = router.connect(recoveryManager);
       await router.initiateRecoveryTimelock();
@@ -321,11 +320,11 @@ describe("ControllerRouter", async () => {
       expect(await router.inRecovery()).to.be.true;
     });
 
-    it("recovery manager is the owner", async () => {
+    it('recovery manager is the owner', async () => {
       expect(await router.owner()).to.equal(recoveryManager.address);
     });
 
-    it("recovery manager can set local recovery manager", async () => {
+    it('recovery manager can set local recovery manager', async () => {
       const recoveryActiveAt = await router.recoveryActiveAt();
       expect(await router.recoveryManager()).to.equal(recoveryManager.address);
       await router.transferOwnership(router.address);
@@ -333,162 +332,162 @@ describe("ControllerRouter", async () => {
       expect(await router.recoveryActiveAt()).to.equal(recoveryActiveAt);
     });
 
-    it("recovery manager can make local calls", async () => {
+    it('recovery manager can make local calls', async () => {
       const value = 12;
-      const call = formatCall(testSet, "set", [value]);
+      const call = formatCall(testSet, 'set', [value]);
       await router.call([call]);
       expect(await testSet.get()).to.equal(value);
     });
 
-    it("recovery manager can set local controller", async () => {
+    it('recovery manager can set local controller', async () => {
       expect(await router.controller()).to.equal(controller.address);
       await router.setController(ethers.constants.AddressZero);
       expect(await router.controller()).to.equal(ethers.constants.AddressZero);
     });
 
-    it("recovery manager can set local abacusConnectionManager", async () => {
+    it('recovery manager can set local abacusConnectionManager', async () => {
       expect(await router.abacusConnectionManager()).to.equal(
-        core.getContracts(localChain).abacusConnectionManager.address
+        core.getContracts(localChain).abacusConnectionManager.address,
       );
       await router.setAbacusConnectionManager(ethers.constants.AddressZero);
       expect(await router.abacusConnectionManager()).to.equal(
-        ethers.constants.AddressZero
+        ethers.constants.AddressZero,
       );
     });
 
-    it("recovery manager can enroll local remote router", async () => {
+    it('recovery manager can enroll local remote router', async () => {
       expect(await router.routers(testDomain)).to.equal(
-        ethers.constants.HashZero
+        ethers.constants.HashZero,
       );
       const newRouter = utils.addressToBytes32(router.address);
       await router.enrollRemoteRouter(testDomain, newRouter);
       expect(await router.routers(testDomain)).to.equal(newRouter);
     });
 
-    it("recovery manager cannot make remote calls", async () => {
+    it('recovery manager cannot make remote calls', async () => {
       const value = 13;
-      const call = formatCall(testSet, "set", [value]);
+      const call = formatCall(testSet, 'set', [value]);
       await expect(router.callRemote(remoteDomain, [call])).to.be.revertedWith(
-        "!controller"
+        '!controller',
       );
     });
 
-    it("recovery manager cannot set remote controller", async () => {
+    it('recovery manager cannot set remote controller', async () => {
       await expect(
-        router.setControllerRemote(remoteDomain, router.address)
-      ).to.be.revertedWith("!controller");
+        router.setControllerRemote(remoteDomain, router.address),
+      ).to.be.revertedWith('!controller');
     });
 
-    it("recovery manager cannot set remote abacusConnectionManager", async () => {
+    it('recovery manager cannot set remote abacusConnectionManager', async () => {
       await expect(
-        router.setAbacusConnectionManagerRemote(remoteDomain, router.address)
-      ).to.be.revertedWith("!controller");
+        router.setAbacusConnectionManagerRemote(remoteDomain, router.address),
+      ).to.be.revertedWith('!controller');
     });
 
-    it("recovery manager cannot enroll remote remote router", async () => {
+    it('recovery manager cannot enroll remote remote router', async () => {
       await expect(
         router.enrollRemoteRouterRemote(
           remoteDomain,
           testDomain,
-          utils.addressToBytes32(router.address)
-        )
-      ).to.be.revertedWith("!controller");
+          utils.addressToBytes32(router.address),
+        ),
+      ).to.be.revertedWith('!controller');
     });
 
-    it("recovery manager cannot initiate recovery", async () => {
+    it('recovery manager cannot initiate recovery', async () => {
       await expect(router.initiateRecoveryTimelock()).to.be.revertedWith(
-        "recovery"
+        'recovery',
       );
     });
 
-    it("recovery manager can exit recovery ", async () => {
-      await expect(router.exitRecovery()).to.emit(router, "ExitRecovery");
+    it('recovery manager can exit recovery ', async () => {
+      await expect(router.exitRecovery()).to.emit(router, 'ExitRecovery');
       expect(await router.inRecovery()).to.be.false;
     });
 
-    it("controller cannot make local calls", async () => {
+    it('controller cannot make local calls', async () => {
       const value = 12;
-      const call = formatCall(testSet, "set", [value]);
+      const call = formatCall(testSet, 'set', [value]);
       await expect(router.connect(controller).call([call])).to.be.revertedWith(
-        ONLY_OWNER_REVERT_MESSAGE
+        ONLY_OWNER_REVERT_MESSAGE,
       );
     });
 
-    it("controller cannot set local controller", async () => {
+    it('controller cannot set local controller', async () => {
       await expect(
-        router.connect(controller).setController(ethers.constants.AddressZero)
+        router.connect(controller).setController(ethers.constants.AddressZero),
       ).to.be.revertedWith(ONLY_OWNER_REVERT_MESSAGE);
     });
 
-    it("controller cannot set local recovery manager", async () => {
+    it('controller cannot set local recovery manager', async () => {
       await expect(
-        router.connect(controller).transferOwnership(router.address)
+        router.connect(controller).transferOwnership(router.address),
       ).to.be.revertedWith(ONLY_OWNER_REVERT_MESSAGE);
     });
 
-    it("controller cannot set local abacusConnectionManager", async () => {
+    it('controller cannot set local abacusConnectionManager', async () => {
       await expect(
-        router.connect(controller).setAbacusConnectionManager(router.address)
+        router.connect(controller).setAbacusConnectionManager(router.address),
       ).to.be.revertedWith(ONLY_OWNER_REVERT_MESSAGE);
     });
 
-    it("controller cannot enroll local remote router", async () => {
+    it('controller cannot enroll local remote router', async () => {
       await expect(
         router
           .connect(controller)
           .enrollRemoteRouter(
             testDomain,
-            utils.addressToBytes32(router.address)
-          )
+            utils.addressToBytes32(router.address),
+          ),
       ).to.be.revertedWith(ONLY_OWNER_REVERT_MESSAGE);
     });
 
-    it("controller cannot make remote calls", async () => {
+    it('controller cannot make remote calls', async () => {
       const value = 13;
-      const call = formatCall(testSet, "set", [value]);
+      const call = formatCall(testSet, 'set', [value]);
       await expect(
-        router.connect(controller).callRemote(remoteDomain, [call])
-      ).to.be.revertedWith("recovery");
+        router.connect(controller).callRemote(remoteDomain, [call]),
+      ).to.be.revertedWith('recovery');
     });
 
-    it("controller cannot set remote controller", async () => {
-      await expect(
-        router
-          .connect(controller)
-          .setControllerRemote(remoteDomain, router.address)
-      ).to.be.revertedWith("recovery");
-    });
-
-    it("controller cannot set remote abacusConnectionManager", async () => {
+    it('controller cannot set remote controller', async () => {
       await expect(
         router
           .connect(controller)
-          .setAbacusConnectionManagerRemote(remoteDomain, router.address)
-      ).to.be.revertedWith("recovery");
+          .setControllerRemote(remoteDomain, router.address),
+      ).to.be.revertedWith('recovery');
     });
 
-    it("controller cannot enroll remote remote router", async () => {
+    it('controller cannot set remote abacusConnectionManager', async () => {
+      await expect(
+        router
+          .connect(controller)
+          .setAbacusConnectionManagerRemote(remoteDomain, router.address),
+      ).to.be.revertedWith('recovery');
+    });
+
+    it('controller cannot enroll remote remote router', async () => {
       await expect(
         router
           .connect(controller)
           .enrollRemoteRouterRemote(
             remoteDomain,
             testDomain,
-            utils.addressToBytes32(router.address)
-          )
-      ).to.be.revertedWith("recovery");
+            utils.addressToBytes32(router.address),
+          ),
+      ).to.be.revertedWith('recovery');
     });
 
-    it("controller cannot initiate recovery", async () => {
+    it('controller cannot initiate recovery', async () => {
       await expect(
-        router.connect(controller).initiateRecoveryTimelock()
-      ).to.be.revertedWith("recovery");
+        router.connect(controller).initiateRecoveryTimelock(),
+      ).to.be.revertedWith('recovery');
     });
 
-    it("controller cannot exit recovery", async () => {
+    it('controller cannot exit recovery', async () => {
       await expect(
-        router.connect(controller).exitRecovery()
-      ).to.be.revertedWith("!recoveryManager");
+        router.connect(controller).exitRecovery(),
+      ).to.be.revertedWith('!recoveryManager');
     });
   });
 });

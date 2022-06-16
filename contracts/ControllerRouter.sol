@@ -102,7 +102,11 @@ contract ControllerRouter is Version0, Router {
 
     // ============ Initializer ============
 
-    function initialize(address _abacusConnectionManager) public override initializer {
+    function initialize(address _abacusConnectionManager)
+        public
+        override
+        initializer
+    {
         __Router_initialize(_abacusConnectionManager);
         controller = msg.sender;
     }

@@ -1,15 +1,17 @@
+import { ethers } from 'ethers';
+
 import {
   UpgradeBeaconController,
-  UpgradeBeaconController__factory,
-} from "@abacus-network/core";
+  UpgradeBeaconController__factory
+} from '@abacus-network/core';
 import {
   ChainName,
   RouterContracts,
-  RouterFactories,
-} from "@abacus-network/sdk";
-import { types } from "@abacus-network/utils";
-import { ethers } from "ethers";
-import { ControllerRouter, ControllerRouter__factory } from "./types";
+  RouterFactories
+} from '@abacus-network/sdk';
+import { types } from '@abacus-network/utils';
+
+import { ControllerRouter, ControllerRouter__factory } from '../types';
 
 export type ControllerConfig<IsGovernor extends boolean = false> = {
   recoveryManager: types.Address;
@@ -21,7 +23,7 @@ export type ControllerConfig<IsGovernor extends boolean = false> = {
 
 export type ControllerConfigMap<
   Chain extends ChainName,
-  ControllerChain extends Chain
+  ControllerChain extends Chain,
 > = {
   [key in Chain]: key extends ControllerChain
     ? ControllerConfig<true>
@@ -43,26 +45,26 @@ export type ControllerContracts = RouterContracts<ControllerRouter> & {
 
 export function validateControllerConfig<
   Chain extends ChainName = ChainName,
-  ControllerChain extends Chain = Chain
+  ControllerChain extends Chain = Chain,
 >(configs: ControllerConfigMap<Chain, ControllerChain>) {
   const controllingEntry = Object.entries<ControllerConfig<any>>(configs).find(
-    ([_, config]) => config.controller !== ethers.constants.AddressZero
+    ([_, config]) => config.controller !== ethers.constants.AddressZero,
   );
 
   if (!controllingEntry) {
-    throw new Error("Config does not contain any controller");
+    throw new Error('Config does not contain any controller');
   }
 
   const controllingChain = controllingEntry[0];
 
   for (const [chain, config] of Object.entries<ControllerConfig<any>>(
-    configs
+    configs,
   )) {
     if (chain === controllingChain) continue;
 
     if (config.controller !== ethers.constants.AddressZero) {
       throw new Error(
-        `Config contains controller ${config.controller} for chain ${chain}, but chain ${controllingChain} does as well`
+        `Config contains controller ${config.controller} for chain ${chain}, but chain ${controllingChain} does as well`,
       );
     }
   }

@@ -1,18 +1,19 @@
-import { expect } from "chai";
+import { expect } from 'chai';
 
-import { AbacusRouterChecker, RouterConfig } from "@abacus-network/deploy";
-import { AbacusCore, ChainName, MultiProvider } from "@abacus-network/sdk";
-import { ControllerApp } from "./app";
+import { AbacusRouterChecker, RouterConfig } from '@abacus-network/deploy';
+import { AbacusCore, ChainName, MultiProvider } from '@abacus-network/sdk';
+
+import { ControllerApp } from './app';
 import {
   ControllerConfig,
   ControllerConfigMap,
   ControllerContracts,
-} from "./config";
-import { buildRouterConfigMap } from "./utils";
+} from './config';
+import { buildRouterConfigMap } from './utils';
 
 export class ControllerChecker<
   Chain extends ChainName,
-  ControllerChain extends Chain
+  ControllerChain extends Chain,
 > extends AbacusRouterChecker<
   Chain,
   ControllerContracts,
@@ -23,7 +24,7 @@ export class ControllerChecker<
     multiProvider: MultiProvider<Chain>,
     app: ControllerApp<Chain>,
     configMap: ControllerConfigMap<Chain, ControllerChain>,
-    core: AbacusCore<Chain>
+    core: AbacusCore<Chain>,
   ) {
     super(multiProvider, app, buildRouterConfigMap(configMap, core));
   }

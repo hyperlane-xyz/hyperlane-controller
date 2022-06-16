@@ -1,5 +1,5 @@
-import { AbacusRouterDeployer, RouterConfig } from "@abacus-network/deploy";
-import { DeployerOptions } from "@abacus-network/deploy/dist/src/deploy";
+import { AbacusRouterDeployer, RouterConfig } from '@abacus-network/deploy';
+import { DeployerOptions } from '@abacus-network/deploy/dist/src/deploy';
 import {
   AbacusCore,
   ChainMap,
@@ -7,19 +7,20 @@ import {
   MultiProvider,
   objMap,
   promiseObjAll,
-} from "@abacus-network/sdk";
+} from '@abacus-network/sdk';
+
 import {
   ControllerConfig,
   ControllerConfigMap,
   ControllerContracts,
-  controllerFactories,
   ControllerFactories,
-} from "./config";
-import { buildRouterConfigMap } from "./utils";
+  controllerFactories,
+} from './config';
+import { buildRouterConfigMap } from './utils';
 
 export class ControllerDeployer<
   Chain extends ChainName,
-  ControllerChain extends Chain
+  ControllerChain extends Chain,
 > extends AbacusRouterDeployer<
   Chain,
   ControllerContracts,
@@ -30,39 +31,39 @@ export class ControllerDeployer<
     multiProvider: MultiProvider<Chain>,
     configMap: ControllerConfigMap<Chain, ControllerChain>,
     core: AbacusCore<Chain>,
-    options?: DeployerOptions
+    options?: DeployerOptions,
   ) {
     super(
       multiProvider,
       buildRouterConfigMap(configMap, core),
       controllerFactories,
-      options
+      options,
     );
   }
 
   async deployContracts(
     chain: Chain,
-    config: ControllerConfig & RouterConfig
+    config: ControllerConfig & RouterConfig,
   ): Promise<ControllerContracts> {
     const dc = this.multiProvider.getChainConnection(chain);
 
     const upgradeBeaconController = await this.deployContract(
       chain,
-      "upgradeBeaconController",
-      []
+      'upgradeBeaconController',
+      [],
     );
 
     const router = await this.deployProxiedContract(
       chain,
-      "router",
+      'router',
       [config.recoveryTimelock],
       upgradeBeaconController.address,
-      [config.abacusConnectionManager]
+      [config.abacusConnectionManager],
     );
 
     await upgradeBeaconController.transferOwnership(
       router.address,
-      dc.overrides
+      dc.overrides,
     );
 
     return {
@@ -74,8 +75,8 @@ export class ControllerDeployer<
   async setControllers(contractsMap: ChainMap<Chain, ControllerContracts>) {
     return promiseObjAll(
       objMap(contractsMap, async (local, contracts) =>
-        contracts.router.setController(this.configMap[local].controller)
-      )
+        contracts.router.setController(this.configMap[local].controller),
+      ),
     );
   }
 
