@@ -1,6 +1,5 @@
 import '@nomiclabs/hardhat-waffle';
 import { expect } from 'chai';
-import { Signer } from 'ethers';
 import { ethers } from 'hardhat';
 
 import { TestRecipient__factory } from '@abacus-network/core';
@@ -11,25 +10,27 @@ import { ChainMap, MultiProvider, TestChainNames } from '@abacus-network/sdk';
 import { addressToBytes32 } from '@abacus-network/utils/dist/src/utils';
 
 import {
+  controllerChain,
   ControllerChain,
-  controllerConfigMap,
+  controllerConfigMap
 } from '../config/test/controller';
 
+import { Signer } from 'ethers';
 import { ControllerApp } from './app';
 import { ControllerContracts } from './config';
 import { ControllerDeployer } from './deploy';
 
-describe('ControllerApp', async () => {
+describe('App', async () => {
   let multiProvider: MultiProvider<TestChainNames>;
+  let core: TestCoreApp;
   let deployer: ControllerDeployer<TestChainNames, ControllerChain>;
   let contracts: ChainMap<TestChainNames, ControllerContracts>;
   let controllerSigner: Signer;
-  let core: TestCoreApp;
+  let deployerSigner: Signer;
 
   before(async () => {
-    const [controller] = await ethers.getSigners();
-    controllerSigner = controller;
-    multiProvider = hardhatMultiProvider(ethers.provider, controller);
+    [deployerSigner, controllerSigner] = await ethers.getSigners();
+    multiProvider = hardhatMultiProvider(ethers.provider, deployerSigner);
     const coreDeployer = new TestCoreDeploy(multiProvider);
     core = await coreDeployer.deployCore();
     deployer = new ControllerDeployer(multiProvider, controllerConfigMap, core);
@@ -65,7 +66,8 @@ describe('ControllerApp', async () => {
     });
 
     it('can execute', async () => {
-      await app.execute();
+      app.connectToChain(controllerChain, controllerSigner);
+      await app.execute(controllerSigner);
       await core.processMessages();
     });
   });
